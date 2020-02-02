@@ -2,7 +2,7 @@ CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native -Og -g -Wno-format -D_POSI
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
-BIN=split hist
+BIN=split hist mtf
 
 .PHONY: all
 all: $(BIN)

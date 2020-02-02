@@ -12,12 +12,24 @@ make
 
 ./hist L H
 
+./mtf L L.mtf
+./mtf H H.mtf
+
+./hist L.mtf H.mtf
+
 # level 2
 
 ./split L{,L,H}
 ./split H{,L,H}
 
 ./hist L{L,H} H{L,H}
+
+./mtf LL LL.mtf
+./mtf LH LH.mtf
+./mtf HL HL.mtf
+./mtf HH HH.mtf
+
+./hist L{L,H}.mtf H{L,H}.mtf
 
 # level 3
 
