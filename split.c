@@ -80,7 +80,7 @@ int compare_cooc_pairs(uchar pair[2])
 	assert(N0 <= ~0UL / D1);
 	assert(N1 <= ~0UL / D0);
 
-	return N0 * D1 < N1 * D0; /* FIXME: overflow */
+	return N0 * D1 < N1 * D0;
 }
 
 int is_in_order_cooc(uchar pair[2])

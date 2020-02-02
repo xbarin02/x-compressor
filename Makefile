@@ -4,10 +4,10 @@ LDLIBS=-lm
 
 BIN=split hist mtf grenc
 
-grenc: grenc.o bio.o vector.o
-
 .PHONY: all
 all: $(BIN)
+
+grenc: grenc.o bio.o vector.o
 
 .PHONY: clean
 clean:
