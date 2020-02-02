@@ -15,7 +15,7 @@ make
 # level 2
 
 for s in {L,H}; do
-	./split $s{,L,H}
+	./split ${s}{,L,H}
 done
 
 ./hist {L,H}{L,H}
@@ -23,7 +23,7 @@ done
 # level 3
 
 for s in {L,H}{L,H}; do
-	./split $s{,L,H}
+	./split ${s}{,L,H}
 done
 
 ./hist {L,H}{L,H}{L,H}
@@ -31,7 +31,23 @@ done
 # level 4
 
 for s in {L,H}{L,H}{L,H}; do
-	./split $s{,L,H}
+	./split ${s}{,L,H}
 done
 
 ./hist {L,H}{L,H}{L,H}{L,H}
+
+# level 5
+
+for s in {L,H}{L,H}{L,H}{L,H}; do
+	./split ${s}{,L,H}
+done
+
+./hist {L,H}{L,H}{L,H}{L,H}{L,H}
+
+# level 6
+
+for s in {L,H}{L,H}{L,H}{L,H}{L,H}; do
+	./split ${s}{,L,H}
+done
+
+./hist {L,H}{L,H}{L,H}{L,H}{L,H}{L,H}
