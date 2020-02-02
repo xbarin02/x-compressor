@@ -10,26 +10,14 @@ make
 
 ./split
 
-./hist L H
-
-./mtf L L.mtf
-./mtf H H.mtf
-
-./hist L.mtf H.mtf
+./hist {L,H}
 
 # level 2
 
 ./split L{,L,H}
 ./split H{,L,H}
 
-./hist L{L,H} H{L,H}
-
-./mtf LL LL.mtf
-./mtf LH LH.mtf
-./mtf HL HL.mtf
-./mtf HH HH.mtf
-
-./hist L{L,H}.mtf H{L,H}.mtf
+./hist {L,H}{L,H}
 
 # level 3
 
@@ -38,7 +26,7 @@ make
 ./split LH{,L,H}
 ./split HH{,L,H}
 
-./hist LL{L,H} LH{L,H} HL{L,H} HH{L,H}
+./hist {L,H}{L,H}{L,H}
 
 # level 4
 
@@ -51,4 +39,4 @@ make
 ./split HHL{,L,H}
 ./split HHH{,L,H}
 
-./hist LLL{L,H} LLH{L,H} LHL{L,H} LHH{L,H} HLL{L,H} HLH{L,H} HHL{L,H} HHH{L,H}
+./hist {L,H}{L,H}{L,H}{L,H}

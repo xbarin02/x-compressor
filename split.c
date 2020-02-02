@@ -11,12 +11,24 @@ size_t cooc[256][256];
 /* frequencies */
 size_t freq[256];
 
+/* move-to-front table */
+uchar order[256];
+
 void init_freq()
 {
 	int i;
 
 	for (i = 0; i < 256; ++i) {
 		freq[i] = i;
+	}
+}
+
+void init_order()
+{
+	int i;
+
+	for (i = 0; i < 256; ++i) {
+		order[i] = i;
 	}
 }
 
@@ -56,6 +68,22 @@ void assert_uniq_freq()
 			assert(freq[i] != freq[j]);
 		}
 	}
+}
+
+void mtf(uchar c)
+{
+	uchar o = order[c];
+	int i;
+
+	/* move all chars in front of 'c' one position back */
+	for (i = 0; i < 256; ++i) {
+		if (order[i] < o) {
+			order[i]++;
+		}
+	}
+
+	/* move 'c' to the front */
+	order[c] = 0;
 }
 
 struct rec {
@@ -141,10 +169,14 @@ int is_in_order_cooc(uchar pair[2])
 #endif
 }
 
-/* TODO: more_recently_used first than second (move-to-front) */
 int is_in_order_freq(uchar pair[2])
 {
 	return freq[pair[0]] > freq[pair[1]];
+}
+
+int is_in_order_mtf(uchar pair[2])
+{
+	return order[pair[0]] < order[pair[1]];
 }
 
 void update_model_cooc(uchar pair[2])
@@ -164,12 +196,21 @@ void update_model_freq(uchar pair[2])
 	/* assert_uniq_freq(); */
 }
 
+void update_model_mtf(uchar pair[2])
+{
+	mtf(pair[0]);
+}
+
 void swap(uchar pair[2])
 {
 	uchar t = pair[0]; pair[0] = pair[1]; pair[1] = t;
 }
 
-#define is_in_order_subordinate(pair) is_in_order_freq(pair)
+#if 1
+#	define is_in_order_subordinate(pair) is_in_order_freq(pair)
+#else
+#	define is_in_order_subordinate(pair) is_in_order_mtf(pair)
+#endif
 
 void transform(int in_order, uchar in[2], uchar out[2])
 {
@@ -195,6 +236,7 @@ void process(FILE *istream, FILE *lstream, FILE *hstream)
 	uchar semi[2] = { 0, 0 };
 
 	init_freq();
+	init_order();
 
 	while (fread(pair, 1, 2, istream) == 2) {
 		int in_order = is_in_order_cooc(pair);
@@ -214,6 +256,7 @@ void process(FILE *istream, FILE *lstream, FILE *hstream)
 		update_model_cooc(pair);
 
 		update_model_freq(out);
+		update_model_mtf(out);
 
 		semi[0] = pair[1];
 	}
