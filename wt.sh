@@ -14,29 +14,24 @@ make
 
 # level 2
 
-./split L{,L,H}
-./split H{,L,H}
+for s in {L,H}; do
+	./split $s{,L,H}
+done
 
 ./hist {L,H}{L,H}
 
 # level 3
 
-./split LL{,L,H}
-./split HL{,L,H}
-./split LH{,L,H}
-./split HH{,L,H}
+for s in {L,H}{L,H}; do
+	./split $s{,L,H}
+done
 
 ./hist {L,H}{L,H}{L,H}
 
 # level 4
 
-./split LLL{,L,H}
-./split LLH{,L,H}
-./split LHL{,L,H}
-./split LHH{,L,H}
-./split HLL{,L,H}
-./split HLH{,L,H}
-./split HHL{,L,H}
-./split HHH{,L,H}
+for s in {L,H}{L,H}{L,H}; do
+	./split $s{,L,H}
+done
 
 ./hist {L,H}{L,H}{L,H}{L,H}
