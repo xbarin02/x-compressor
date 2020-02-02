@@ -51,3 +51,11 @@ for s in {L,H}{L,H}{L,H}{L,H}{L,H}; do
 done
 
 ./hist {L,H}{L,H}{L,H}{L,H}{L,H}{L,H}
+
+# level 7
+
+for s in {L,H}{L,H}{L,H}{L,H}{L,H}{L,H}; do
+	./split ${s}{,L,H}
+done
+
+./hist {L,H}{L,H}{L,H}{L,H}{L,H}{L,H}{L,H}
