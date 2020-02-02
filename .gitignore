@@ -1,3 +1,6 @@
+*.o
+
 hist
 split
 mtf
+grenc

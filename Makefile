@@ -2,7 +2,9 @@ CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native -Og -g -Wno-format -D_POSI
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
-BIN=split hist mtf
+BIN=split hist mtf grenc
+
+grenc: grenc.o bio.o vector.o
 
 .PHONY: all
 all: $(BIN)
