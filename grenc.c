@@ -17,6 +17,12 @@ uchar sorted[256];
 /* char -> index */
 UINT32 order[256];
 
+static size_t opt_k = 3;
+static size_t sum_delta = 0;
+static size_t N = 0;
+
+#define RESET_INTERVAL 128
+
 void init()
 {
 	int i, c;
@@ -49,6 +55,7 @@ void swap(uchar c, uchar d)
 
 	sorted[ic] = d;
 	sorted[id] = c;
+
 	order[c] = id;
 	order[d] = ic;
 }
@@ -71,12 +78,6 @@ retry:
 		}
 	}
 }
-
-static size_t opt_k = 3;
-static size_t sum_delta = 0;
-static size_t N = 0;
-
-#define RESET_INTERVAL 128
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
 void update_model(UINT32 delta)
@@ -160,7 +161,6 @@ int main(int argc, char *argv[])
 	bio_open(&bio, ptr, BIO_MODE_WRITE);
 
 	process(istream, &bio);
-	printf("opt. k = %lu\n", (unsigned long)opt_k);
 
 	bio_close(&bio);
 	bio_dump(&bio, ptr, ostream);
