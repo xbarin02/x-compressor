@@ -99,7 +99,9 @@ void update_model(UINT32 delta)
 
 	--k;
 
-	opt_k = k;
+	if (N > RESET_INTERVAL / 8) {
+		opt_k = k;
+	}
 }
 
 void process(FILE *istream, struct bio *bio)
