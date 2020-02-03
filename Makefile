@@ -10,16 +10,16 @@ ifeq ($(BUILD),debug)
 endif
 
 ifeq ($(BUILD),release)
-	CFLAGS+=-O3
+	CFLAGS+=-O3 -DNDEBUG
 endif
 
 ifeq ($(BUILD),profile-generate)
-	CFLAGS+=-O3 -fprofile-generate
+	CFLAGS+=-O3 -DNDEBUG -fprofile-generate
 	LDFLAGS+=-fprofile-generate
 endif
 
 ifeq ($(BUILD),profile-use)
-	CFLAGS+=-O3 -fprofile-use
+	CFLAGS+=-O3 -DNDEBUG -fprofile-use
 endif
 
 .PHONY: all
