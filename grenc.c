@@ -76,32 +76,30 @@ static size_t opt_k = 3;
 static size_t sum_delta = 0;
 static size_t N = 0;
 
-#define RESET_INTERVAL 512
+#define RESET_INTERVAL 128
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
 void update_model(UINT32 delta)
 {
-	int k;
-
 	if (N == RESET_INTERVAL) {
+		int k;
+
+		/* mean = E{delta} = sum_delta / N */
+
+		/* 2^k <= E{r[k]} + 0 */
+		for (k = 1; (N << k) <= sum_delta; ++k)
+			;
+
+		--k;
+
+		opt_k = k;
+
 		N = 0;
 		sum_delta = 0;
 	}
 
 	sum_delta += delta;
 	N++;
-
-	/* mean = E{delta} = sum_delta / N */
-
-	/* 2^k <= E{r[k]} + 0 */
-	for (k = 1; (N << k) <= sum_delta; ++k)
-		;
-
-	--k;
-
-	if (N > RESET_INTERVAL / 8) {
-		opt_k = k;
-	}
 }
 
 void process(FILE *istream, struct bio *bio)
