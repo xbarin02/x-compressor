@@ -64,7 +64,7 @@ int bio_reload_buffer(struct bio *bio)
 	return 0;
 }
 
-int bio_put_bit(struct bio *bio, unsigned char b)
+static int bio_put_bit(struct bio *bio, unsigned char b)
 {
 	assert(bio != NULL);
 
@@ -89,7 +89,7 @@ int bio_put_bit(struct bio *bio, unsigned char b)
 }
 
 /* c' = CHAR_BIT - c */
-int bio_get_bit(struct bio *bio, unsigned char *b)
+static int bio_get_bit(struct bio *bio, unsigned char *b)
 {
 	assert(bio != NULL);
 
@@ -114,7 +114,7 @@ int bio_get_bit(struct bio *bio, unsigned char *b)
 	return 0;
 }
 
-int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
+static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 {
 	size_t i;
 
@@ -134,7 +134,7 @@ int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 	return 0;
 }
 
-int bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
+static int bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 {
 	size_t i;
 	UINT32 word = 0;

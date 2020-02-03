@@ -44,7 +44,7 @@ void init()
 	}
 }
 
-uchar get_index(uchar p, uchar c)
+static uchar get_index(uchar p, uchar c)
 {
 	return table[p].order[c];
 }
@@ -64,7 +64,7 @@ void swap(uchar p, uchar c, uchar d)
 	table[p].order[d] = ic;
 }
 
-void inc_freq(uchar p, uchar c)
+static void inc_freq(uchar p, uchar c)
 {
 	uchar index;
 	uchar d;
