@@ -15,7 +15,7 @@ size_t freq[256];
 uchar sorted[256];
 
 /* char -> index */
-UINT32 order[256];
+uchar order[256];
 
 static size_t opt_k = 3;
 static size_t sum_delta = 0;
@@ -34,21 +34,21 @@ void init()
 	for (c = 0; c < 256; ++c) {
 		for (i = 0; i < 256; ++i) {
 			if (sorted[i] == c) {
-				order[c] = (UINT32)i;
+				order[c] = (uchar)i;
 			}
 		}
 	}
 }
 
-UINT32 get_index(uchar c)
+uchar get_index(uchar c)
 {
 	return order[c];
 }
 
 void swap(uchar c, uchar d)
 {
-	UINT32 ic = order[c];
-	UINT32 id = order[d];
+	uchar ic = order[c];
+	uchar id = order[d];
 
 	assert(sorted[ic] == c);
 	assert(sorted[id] == d);
@@ -62,7 +62,7 @@ void swap(uchar c, uchar d)
 
 void inc_freq(uchar c)
 {
-	UINT32 index;
+	uchar index;
 	uchar d;
 	freq[c]++;
 
@@ -80,7 +80,7 @@ retry:
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
-void update_model(UINT32 delta)
+void update_model(uchar delta)
 {
 	if (N == RESET_INTERVAL) {
 		int k;
@@ -107,7 +107,7 @@ void process(FILE *istream, struct bio *bio)
 {
 	do {
 		int c = fgetc(istream);
-		UINT32 d;
+		uchar d;
 
 		if (c == EOF) {
 			break;
@@ -117,7 +117,7 @@ void process(FILE *istream, struct bio *bio)
 
 		d = get_index(c);
 
-		bio_write_gr(bio, opt_k, d);
+		bio_write_gr(bio, opt_k, (UINT32)d);
 
 		/* update model */
 		inc_freq((uchar)c);
