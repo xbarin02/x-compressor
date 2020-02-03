@@ -95,8 +95,10 @@ void update_model(UINT32 delta)
 	/* mean = E{delta} = sum_delta / N */
 
 	/* 2^k <= E{r[k]} + 0 */
-	for (k = 0; (N << k) <= sum_delta; ++k)
+	for (k = 1; (N << k) <= sum_delta; ++k)
 		;
+
+	--k;
 
 	/* printf("selected k = %i\n", k); */
 
