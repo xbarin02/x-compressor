@@ -23,7 +23,7 @@ static size_t opt_k = 3;
 static size_t sum_delta = 0;
 static size_t N = 0;
 
-#define RESET_INTERVAL 128
+#define RESET_INTERVAL 256
 
 void init()
 {
