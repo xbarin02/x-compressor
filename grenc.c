@@ -8,14 +8,16 @@
 
 typedef unsigned char uchar;
 
-/* char -> frequency */
-size_t freq[256];
+struct {
+	/* char -> frequency */
+	size_t freq[256];
 
-/* index -> char */
-uchar sorted[256];
+	/* index -> char */
+	uchar sorted[256];
 
-/* char -> index */
-uchar order[256];
+	/* char -> index */
+	uchar order[256];
+} table[256];
 
 static size_t opt_k = 3;
 static size_t sum_delta = 0;
@@ -25,55 +27,57 @@ static size_t N = 0;
 
 void init()
 {
-	int i, c;
+	int p, i, c;
 
-	for (i = 0; i < 256; ++i) {
-		sorted[i] = (uchar)i;
-	}
-
-	for (c = 0; c < 256; ++c) {
+	for (p = 0; p < 256; ++p) {
 		for (i = 0; i < 256; ++i) {
-			if (sorted[i] == c) {
-				order[c] = (uchar)i;
+			table[p].sorted[i] = (uchar)i;
+		}
+
+		for (c = 0; c < 256; ++c) {
+			for (i = 0; i < 256; ++i) {
+				if (table[p].sorted[i] == c) {
+					table[p].order[c] = (uchar)i;
+				}
 			}
 		}
 	}
 }
 
-uchar get_index(uchar c)
+uchar get_index(uchar p, uchar c)
 {
-	return order[c];
+	return table[p].order[c];
 }
 
-void swap(uchar c, uchar d)
+void swap(uchar p, uchar c, uchar d)
 {
-	uchar ic = order[c];
-	uchar id = order[d];
+	uchar ic = table[p].order[c];
+	uchar id = table[p].order[d];
 
-	assert(sorted[ic] == c);
-	assert(sorted[id] == d);
+	assert(table[p].sorted[ic] == c);
+	assert(table[p].sorted[id] == d);
 
-	sorted[ic] = d;
-	sorted[id] = c;
+	table[p].sorted[ic] = d;
+	table[p].sorted[id] = c;
 
-	order[c] = id;
-	order[d] = ic;
+	table[p].order[c] = id;
+	table[p].order[d] = ic;
 }
 
-void inc_freq(uchar c)
+void inc_freq(uchar p, uchar c)
 {
 	uchar index;
 	uchar d;
-	freq[c]++;
+	table[p].freq[c]++;
 
 	/* swap? */
 retry:
-	index = order[c];
+	index = table[p].order[c];
 	if (index > 0) {
-		d = sorted[index - 1];
-		if (freq[c] > freq[d]) {
+		d = table[p].sorted[index - 1];
+		if (table[p].freq[c] > table[p].freq[d]) {
 			/* move c before d */
-			swap(c, d);
+			swap(p, c, d);
 			goto retry;
 		}
 	}
@@ -105,6 +109,8 @@ void update_model(uchar delta)
 
 void process(FILE *istream, struct bio *bio)
 {
+	uchar p = 0;
+
 	do {
 		int c = fgetc(istream);
 		uchar d;
@@ -115,14 +121,16 @@ void process(FILE *istream, struct bio *bio)
 
 		assert(c < 256);
 
-		d = get_index(c);
+		d = get_index(p, c);
 
 		bio_write_gr(bio, opt_k, (UINT32)d);
 
 		/* update model */
-		inc_freq((uchar)c);
+		inc_freq(p, (uchar)c);
 
 		update_model(d);
+
+		p = c;
 	} while (1);
 }
 
