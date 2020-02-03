@@ -15,6 +15,7 @@ size_t freq[256];
 /* index -> char */
 uchar sorted[256];
 
+/* char -> index */
 UINT32 order[256];
 
 void init()
