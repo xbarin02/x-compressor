@@ -8,7 +8,7 @@
 
 typedef unsigned char uchar;
 
-struct {
+struct ctx {
 	/* char -> frequency */
 	size_t freq[256];
 
@@ -61,9 +61,8 @@ static void swap(uchar p, uchar c, uchar d)
 
 static void inc_freq(uchar p, uchar c)
 {
-	uchar d;
-
 #if 1
+	uchar d;
 	uchar ic;
 
 	table[p].freq[c]++;
@@ -80,21 +79,23 @@ retry:
 		}
 	}
 #else
-	uchar id = table[p].order[c];
-	int i = table[p].order[c] - 1;
+	struct ctx *ctx = table + p;
 
-	table[p].freq[c]++;
+	uchar d;
+	size_t freq_c = ++(ctx->freq[c]);
+	uchar *ctx_sorted = ctx->sorted;
+	uchar ic = ctx->order[c];
+	uchar id;
 
-	while (i >= 0 && table[p].freq[c] > table[p].freq[ table[p].sorted[i] ]) {
-		/* should swap */
-		id = i;
-		--i;
+	for (id = 0; id <= ic; ++id) {
+		d = ctx_sorted[id];
+
+		if (freq_c > ctx->freq[d]) {
+			break;
+		}
 	}
 
-	if (id < table[p].order[c]) {
-		d = table[p].sorted[id];
-		swap(p, c, d);
-	}
+	swap(p, c, d);
 #endif
 }
 
