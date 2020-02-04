@@ -61,7 +61,7 @@ static void swap(uchar p, uchar c, uchar d)
 
 static void inc_freq(uchar p, uchar c)
 {
-#if 1
+#if 0
 	uchar d;
 	uchar ic;
 
@@ -95,7 +95,9 @@ retry:
 		}
 	}
 
-	swap(p, c, d);
+	if (c != d) {
+		swap(p, c, d);
+	}
 #endif
 }
 
