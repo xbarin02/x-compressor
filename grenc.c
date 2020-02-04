@@ -61,21 +61,41 @@ static void swap(uchar p, uchar c, uchar d)
 
 static void inc_freq(uchar p, uchar c)
 {
-	uchar index;
 	uchar d;
+
+#if 1
+	uchar ic;
+
 	table[p].freq[c]++;
 
 	/* swap? */
 retry:
-	index = table[p].order[c];
-	if (index > 0) {
-		d = table[p].sorted[index - 1];
+	ic = table[p].order[c];
+	if (ic > 0) {
+		d = table[p].sorted[ic - 1];
 		if (table[p].freq[c] > table[p].freq[d]) {
 			/* move c before d */
 			swap(p, c, d);
 			goto retry;
 		}
 	}
+#else
+	uchar id = table[p].order[c];
+	int i = table[p].order[c] - 1;
+
+	table[p].freq[c]++;
+
+	while (i >= 0 && table[p].freq[c] > table[p].freq[ table[p].sorted[i] ]) {
+		/* should swap */
+		id = i;
+		--i;
+	}
+
+	if (id < table[p].order[c]) {
+		d = table[p].sorted[id];
+		swap(p, c, d);
+	}
+#endif
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
