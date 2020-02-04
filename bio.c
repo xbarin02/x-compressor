@@ -173,8 +173,10 @@ int bio_close(struct bio *bio)
 
 static int bio_write_unary(struct bio *bio, UINT32 N)
 {
-	UINT32 n;
 	int err;
+
+#if 0
+	UINT32 n;
 
 	for (n = 0; n < N; ++n) {
 		int err = bio_put_bit(bio, 0);
@@ -183,6 +185,25 @@ static int bio_write_unary(struct bio *bio, UINT32 N)
 			return err;
 		}
 	}
+#else
+	UINT32 b = 0;
+
+	while (N > 32) {
+		err = bio_write_bits(bio, b, 32);
+
+		if (err) {
+			return err;
+		}
+
+		N -= 32;
+	}
+
+	err = bio_write_bits(bio, b, N);
+
+	if (err) {
+		return err;
+	}
+#endif
 
 	err = bio_put_bit(bio, 1);
 

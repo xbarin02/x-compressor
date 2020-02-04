@@ -44,11 +44,6 @@ void init()
 	}
 }
 
-static uchar get_index(uchar p, uchar c)
-{
-	return table[p].order[c];
-}
-
 static void swap(uchar p, uchar c, uchar d)
 {
 	uchar ic = table[p].order[c];
@@ -121,7 +116,8 @@ void process(FILE *istream, struct bio *bio)
 
 		assert(c < 256);
 
-		d = get_index(p, c);
+		/* get index */
+		d = table[p].order[c];
 
 		bio_write_gr(bio, opt_k, (UINT32)d);
 
