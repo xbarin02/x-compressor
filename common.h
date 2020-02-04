@@ -3,9 +3,6 @@
 
 #include <stddef.h>
 #include <limits.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
 
 #define UINT32_MAX_ 4294967295U
 #define INT32_MAX_ 2147483647

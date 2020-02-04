@@ -22,6 +22,11 @@ ifeq ($(BUILD),profile-use)
 	CFLAGS+=-O3 -DNDEBUG -fprofile-use
 endif
 
+ifeq ($(BUILD),profile)
+	CFLAGS+=-Og -g -pg
+	LDFLAGS+=-rdynamic -pg
+endif
+
 .PHONY: all
 all: $(BIN)
 
@@ -33,4 +38,4 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	-$(RM) -- *.gcda
+	-$(RM) -- *.gcda gmon.out

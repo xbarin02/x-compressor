@@ -1,5 +1,7 @@
 *.o
 *.gcda
+gmon.out
+cachegrind.out.*
 
 hist
 split

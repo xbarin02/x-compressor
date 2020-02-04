@@ -36,7 +36,7 @@ int bio_open(struct bio *bio, unsigned char *ptr, int mode)
 	return 0;
 }
 
-int bio_flush_buffer(struct bio *bio)
+static int bio_flush_buffer(struct bio *bio)
 {
 	assert(bio);
 
@@ -51,7 +51,7 @@ int bio_flush_buffer(struct bio *bio)
 	return 0;
 }
 
-int bio_reload_buffer(struct bio *bio)
+static int bio_reload_buffer(struct bio *bio)
 {
 	assert(bio != NULL);
 
@@ -171,7 +171,7 @@ int bio_close(struct bio *bio)
 	return 0;
 }
 
-int bio_write_unary(struct bio *bio, UINT32 N)
+static int bio_write_unary(struct bio *bio, UINT32 N)
 {
 	UINT32 n;
 	int err;
@@ -193,7 +193,7 @@ int bio_write_unary(struct bio *bio, UINT32 N)
 	return 0;
 }
 
-int bio_read_unary(struct bio *bio, UINT32 *N)
+static int bio_read_unary(struct bio *bio, UINT32 *N)
 {
 	UINT32 Q = 0;
 

@@ -49,7 +49,7 @@ static uchar get_index(uchar p, uchar c)
 	return table[p].order[c];
 }
 
-void swap(uchar p, uchar c, uchar d)
+static void swap(uchar p, uchar c, uchar d)
 {
 	uchar ic = table[p].order[c];
 	uchar id = table[p].order[d];
