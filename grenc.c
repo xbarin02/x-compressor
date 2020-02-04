@@ -90,7 +90,7 @@ retry:
 	for (id = 0; id <= ic; ++id) {
 		d = ctx_sorted[id];
 
-		if (freq_c > ctx->freq[d]) {
+		if (ctx->freq[d] < freq_c) {
 			break;
 		}
 	}
