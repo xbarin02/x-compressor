@@ -61,7 +61,7 @@ static void swap(uchar p, uchar c, uchar d)
 
 static void inc_freq(uchar p, uchar c)
 {
-#if 0
+#if 1
 	uchar d;
 	uchar ic;
 

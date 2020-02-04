@@ -88,6 +88,44 @@ static int bio_put_bit(struct bio *bio, unsigned char b)
 	return 0;
 }
 
+static size_t size_min(size_t a, size_t b) { return a < b ? a : b; }
+
+/* we can write at most ... bits out of 'n' */
+static size_t bio_put_bits_query(struct bio *bio, size_t n)
+{
+	assert(bio != NULL);
+
+	assert(CHAR_BIT > bio->c);
+
+	return size_min(CHAR_BIT - bio->c, n);
+}
+
+/* write n bits */
+static int bio_put_bits(struct bio *bio, UINT32 b, size_t n)
+{
+	assert(bio != NULL);
+
+	assert(bio->c < CHAR_BIT);
+
+	assert(CHAR_BIT - bio->c <= n);
+
+	bio->b |= (unsigned char)((b & (((UINT32)1 << n) - 1)) << bio->c);
+
+	bio->c += n;
+
+	if (bio->c == CHAR_BIT) {
+		int err = bio_flush_buffer(bio);
+
+		if (err) {
+			return err;
+		}
+
+		bio_reset_after_flush(bio);
+	}
+
+	return 0;
+}
+
 /* c' = CHAR_BIT - c */
 static int bio_get_bit(struct bio *bio, unsigned char *b)
 {
@@ -120,6 +158,7 @@ static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 
 	assert(n <= 32);
 
+#if 0
 	for (i = 0; i < n; ++i) {
 		/* masking the LSB omitted */
 		int err = bio_put_bit(bio, (unsigned char)b);
@@ -130,6 +169,20 @@ static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 			return err;
 		}
 	}
+#else
+	for (; n > 0; ) {
+		size_t m = bio_put_bits_query(bio, n);
+
+		int err = bio_put_bits(bio, b, m);
+
+		if (err) {
+			return err;
+		}
+
+		b >>= m;
+		n -= m;
+	}
+#endif
 
 	return 0;
 }
