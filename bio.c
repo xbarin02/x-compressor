@@ -107,7 +107,7 @@ static int bio_put_bits(struct bio *bio, UINT32 b, size_t n)
 
 	assert(bio->c < CHAR_BIT);
 
-	assert(CHAR_BIT - bio->c <= n);
+	assert(CHAR_BIT >= bio->c + n);
 
 	bio->b |= (unsigned char)((b & (((UINT32)1 << n) - 1)) << bio->c);
 
