@@ -27,6 +27,9 @@ ifeq ($(BUILD),profile)
 	LDFLAGS+=-rdynamic -pg
 endif
 
+CFLAGS+=-flto
+LDFLAGS+=-flto
+
 .PHONY: all
 all: $(BIN)
 

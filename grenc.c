@@ -118,7 +118,7 @@ retry:
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
-void update_model(uchar delta)
+static void update_model(uchar delta)
 {
 	if (N == RESET_INTERVAL) {
 		int k;
