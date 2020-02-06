@@ -104,20 +104,19 @@ retry:
 	struct ctx *ctx = table + p;
 
 	uchar d = c;
-	uchar ic;
-	int k;
+	uchar ic = ctx->order[c];
+	uchar *pd;
 
-	ctx->freq[c]++;
+	size_t freq_c = ++(ctx->freq[c]);
 
-	ic = ctx->order[c];
-
-	for (k = 0; ic >= 1 + k; ++k) {
-		d = ctx->sorted[ic - 1 - k];
-		if (ctx->freq[c] <= ctx->freq[d]) {
+	for (pd = ctx->sorted + ic - 1; pd >= ctx->sorted; --pd) {
+		if (freq_c <= ctx->freq[*pd]) {
 			break;
 		}
 	}
-	d = ctx->sorted[ic - 1 - (k - 1)];
+
+	d = *(pd + 1);
+
 	if (c != d) {
 		swap(p, c, d);
 	}
