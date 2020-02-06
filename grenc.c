@@ -61,7 +61,7 @@ static void swap(uchar p, uchar c, uchar d)
 
 static void inc_freq(uchar p, uchar c)
 {
-#if 1
+#if 0
 	uchar d;
 	uchar ic;
 
@@ -78,7 +78,8 @@ retry:
 			goto retry;
 		}
 	}
-#else
+#endif
+#if 0
 	struct ctx *ctx = table + p;
 
 	uchar d;
@@ -95,6 +96,28 @@ retry:
 		}
 	}
 
+	if (c != d) {
+		swap(p, c, d);
+	}
+#endif
+#if 1
+	struct ctx *ctx = table + p;
+
+	uchar d = c;
+	uchar ic;
+	int k;
+
+	ctx->freq[c]++;
+
+	ic = ctx->order[c];
+
+	for (k = 0; ic >= 1 + k; ++k) {
+		d = ctx->sorted[ic - 1 - k];
+		if (ctx->freq[c] <= ctx->freq[d]) {
+			break;
+		}
+	}
+	d = ctx->sorted[ic - 1 - (k - 1)];
 	if (c != d) {
 		swap(p, c, d);
 	}
