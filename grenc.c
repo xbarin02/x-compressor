@@ -44,37 +44,39 @@ void init()
 	}
 }
 
-static void swap(uchar p, uchar c, uchar d)
+static void ctx_swap(struct ctx *ctx, uchar c, uchar d)
 {
-	uchar ic = table[p].order[c];
-	uchar id = table[p].order[d];
+	uchar ic = ctx->order[c];
+	uchar id = ctx->order[d];
 
-	assert(table[p].sorted[ic] == c);
-	assert(table[p].sorted[id] == d);
+	assert(ctx->sorted[ic] == c);
+	assert(ctx->sorted[id] == d);
 
-	table[p].sorted[ic] = d;
-	table[p].sorted[id] = c;
+	ctx->sorted[ic] = d;
+	ctx->sorted[id] = c;
 
-	table[p].order[c] = id;
-	table[p].order[d] = ic;
+	ctx->order[c] = id;
+	ctx->order[d] = ic;
 }
 
 static void inc_freq(uchar p, uchar c)
 {
-#if 0
+#if 1
+	struct ctx *ctx = table + p;
+
 	uchar d;
 	uchar ic;
 
-	table[p].freq[c]++;
+	size_t freq_c = ++(ctx->freq[c]);
 
 	/* swap? */
 retry:
-	ic = table[p].order[c];
+	ic = ctx->order[c];
 	if (ic > 0) {
-		d = table[p].sorted[ic - 1];
-		if (table[p].freq[c] > table[p].freq[d]) {
+		d = ctx->sorted[ic - 1];
+		if (freq_c > ctx->freq[d]) {
 			/* move c before d */
-			swap(p, c, d);
+			ctx_swap(ctx, c, d);
 			goto retry;
 		}
 	}
@@ -83,24 +85,22 @@ retry:
 	struct ctx *ctx = table + p;
 
 	uchar d;
-	size_t freq_c = ++(ctx->freq[c]);
-	uchar *ctx_sorted = ctx->sorted;
 	uchar ic = ctx->order[c];
-	uchar id;
+	uchar *pd;
 
-	for (id = 0; id <= ic; ++id) {
-		d = ctx_sorted[id];
+	size_t freq_c = ++(ctx->freq[c]);
 
-		if (ctx->freq[d] < freq_c) {
+	for (pd = ctx->sorted; pd <= ctx->sorted + ic; ++pd) {
+		if (ctx->freq[*pd] < freq_c) {
 			break;
 		}
 	}
 
-	if (c != d) {
-		swap(p, c, d);
+	if (c != *pd) {
+		ctx_swap(ctx, c, *pd);
 	}
 #endif
-#if 1
+#if 0
 	struct ctx *ctx = table + p;
 
 	uchar d = c;
@@ -118,7 +118,7 @@ retry:
 	d = *(pd + 1);
 
 	if (c != d) {
-		swap(p, c, d);
+		ctx_swap(ctx, c, d);
 	}
 #endif
 }
