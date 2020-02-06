@@ -59,11 +59,9 @@ static void ctx_swap(struct ctx *ctx, uchar c, uchar d)
 	ctx->order[d] = ic;
 }
 
-static void inc_freq(uchar p, uchar c)
+static void inc_freq(struct ctx *ctx, uchar c)
 {
 #if 1
-	struct ctx *ctx = table + p;
-
 	uchar d;
 	uchar ic;
 
@@ -82,8 +80,6 @@ retry:
 	}
 #endif
 #if 0
-	struct ctx *ctx = table + p;
-
 	uchar d;
 	uchar ic = ctx->order[c];
 	uchar *pd;
@@ -101,8 +97,6 @@ retry:
 	}
 #endif
 #if 0
-	struct ctx *ctx = table + p;
-
 	uchar d = c;
 	uchar ic = ctx->order[c];
 	uchar *pd;
@@ -149,7 +143,7 @@ void update_model(uchar delta)
 
 void process(FILE *istream, struct bio *bio)
 {
-	uchar p = 0;
+	struct ctx *ctx = table + 0;
 
 	do {
 		int c = fgetc(istream);
@@ -162,16 +156,16 @@ void process(FILE *istream, struct bio *bio)
 		assert(c < 256);
 
 		/* get index */
-		d = table[p].order[c];
+		d = ctx->order[c];
 
 		bio_write_gr(bio, opt_k, (UINT32)d);
 
 		/* update model */
-		inc_freq(p, (uchar)c);
+		inc_freq(ctx, (uchar)c);
 
 		update_model(d);
 
-		p = c;
+		ctx = table + c;
 	} while (1);
 }
 
