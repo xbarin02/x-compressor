@@ -46,8 +46,13 @@ void init()
 
 static void swap(struct ctx *ctx, uchar c, uchar d)
 {
-	uchar ic = ctx->order[c];
-	uchar id = ctx->order[d];
+	uchar ic;
+	uchar id;
+
+	assert(ctx != NULL);
+
+	ic = ctx->order[c];
+	id = ctx->order[d];
 
 	assert(ctx->sorted[ic] == c);
 	assert(ctx->sorted[id] == d);
@@ -81,10 +86,14 @@ retry:
 #endif
 #if 1
 	uchar d = c;
-	uchar ic = ctx->order[c];
+	uchar ic;
 	uchar *pd;
+	size_t freq_c;
 
-	size_t freq_c = ++(ctx->freq[c]);
+	assert(ctx != NULL);
+
+	ic = ctx->order[c];
+	freq_c = ++(ctx->freq[c]);
 
 	for (pd = ctx->sorted + ic - 1; pd >= ctx->sorted; --pd) {
 		if (freq_c <= ctx->freq[*pd]) {
