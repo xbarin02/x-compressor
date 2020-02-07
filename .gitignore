@@ -4,7 +4,4 @@ gmon.out
 cachegrind.out.*
 callgrind.out.*
 
-hist
-split
-mtf
 grenc
