@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 #include "common.h"
 #include "bio.h"
@@ -145,7 +146,7 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 	bio_write_gr(bio, opt_k, 256);
 }
 
-void decompress(struct bio *bio, uchar *ptr)
+uchar *decompress(struct bio *bio, uchar *ptr)
 {
 	struct ctx *ctx = table + 0;
 
@@ -171,6 +172,8 @@ void decompress(struct bio *bio, uchar *ptr)
 
 		ctx = table + c;
 	} while (1);
+
+	return ptr + 0;
 }
 
 void fload(void *ptr, size_t size, FILE *stream)
@@ -187,11 +190,11 @@ void fsave(void *ptr, size_t size, FILE *stream)
 	}
 }
 
-void bio_dump(struct bio *bio, void *ptr, FILE *stream)
+void fdump(void *end, void *ptr, FILE *stream)
 {
-	size_t size = bio->ptr - (unsigned char *)ptr;
+	size_t size = (uchar *)end - (uchar *)ptr;
 
-	printf("coded stream size: %lu bytes\n", (unsigned long)size);
+	printf("output stream size: %lu bytes\n", (unsigned long)size);
 
 	fsave(ptr, size, stream);
 }
@@ -215,13 +218,40 @@ size_t fsize(FILE *stream)
 	return (size_t)size;
 }
 
+enum {
+	COMPRESS,
+	DECOMPRESS
+};
+
 int main(int argc, char *argv[])
 {
-	FILE *istream = fopen(argc > 1 ? argv[1] : "L", "r");
-	FILE *ostream = fopen(argc > 2 ? argv[2] : "L.gr", "w");
+	int mode = (argc > 0 && strstr(argv[0], "ungr")) ? DECOMPRESS : COMPRESS;
+	FILE *istream = argc > 1 ? fopen(argv[1], "r") : stdin;
+	FILE *ostream = argc > 2 ? fopen(argv[2], "w") : stdout;
 	size_t isize;
 	struct bio bio;
 	void *iptr, *optr;
+
+	fprintf(stderr, "mode = %s (due to %s)\n", mode == COMPRESS ? "compress" : "decompress", argv[0]);
+
+	if (argc == 2) {
+		char path[4096];
+		switch (mode) {
+			case COMPRESS:
+				strcpy(path, argv[1]);
+				strcat(path, ".gr");
+				break;
+			case DECOMPRESS:
+				strcpy(path, argv[1]);
+				if (strcmp(path + strlen(path) - 3, ".gr") == 0) {
+					path[strlen(path) - 3] = 0;
+				} else {
+					strcat(path, ".out");
+				}
+		}
+		fprintf(stderr, "output = %s\n", path);
+		ostream = fopen(path, "w");
+	}
 
 	if (istream == NULL) {
 		abort();
@@ -234,7 +264,7 @@ int main(int argc, char *argv[])
 	isize = fsize(istream);
 
 	iptr = malloc(isize);
-	optr = malloc(2 * isize);
+	optr = malloc(8 * isize);
 
 	if (iptr == NULL) {
 		abort();
@@ -248,26 +278,25 @@ int main(int argc, char *argv[])
 
 	fload(iptr, isize, istream);
 
-	bio_open(&bio, optr, BIO_MODE_WRITE);
+	if (mode == COMPRESS) {
+		bio_open(&bio, optr, BIO_MODE_WRITE);
 
-	compress(iptr, isize, &bio);
+		compress(iptr, isize, &bio);
 
-	bio_close(&bio);
-	bio_dump(&bio, optr, ostream);
-
-#if 0
-	{
-		void *xptr = malloc(isize);
-		FILE *xstream = fopen("L.gr.out", "w");
-		init();
-		bio_open(&bio, optr, BIO_MODE_READ);
-		decompress(&bio, xptr);
 		bio_close(&bio);
-		fsave(xptr, isize, xstream);
-		fclose(xstream);
-		free(xptr);
+
+		fdump(bio.ptr, optr, ostream);
+	} else {
+		uchar *end;
+
+		bio_open(&bio, iptr, BIO_MODE_READ);
+
+		end = decompress(&bio, optr);
+
+		bio_close(&bio);
+
+		fdump(end, optr, ostream);
 	}
-#endif
 
 	fclose(istream);
 	fclose(ostream);
