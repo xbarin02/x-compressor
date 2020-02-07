@@ -26,7 +26,7 @@ int bio_open(struct bio *bio, unsigned char *ptr, int mode)
 
 	switch (mode) {
 		case BIO_MODE_READ:
-			bio->c = CHAR_BIT;
+			bio->c = 32;
 			break;
 		case BIO_MODE_WRITE:
 			bio_reset_after_flush(bio);
@@ -44,9 +44,11 @@ static int bio_flush_buffer(struct bio *bio)
 		return 1;
 	}
 
-	assert(CHAR_BIT == 8);
+	assert(sizeof(UINT32) * CHAR_BIT == 32);
 
-	*bio->ptr++ = bio->b;
+	*((UINT32 *)bio->ptr) = bio->b;
+
+	bio->ptr += 4;
 
 	return 0;
 }
@@ -59,7 +61,9 @@ static int bio_reload_buffer(struct bio *bio)
 		return 1;
 	}
 
-	bio->b = *bio->ptr++;
+	bio->b = *(UINT32 *)bio->ptr;
+
+	bio->ptr += 4;
 
 	return 0;
 }
@@ -68,14 +72,14 @@ static int bio_put_bit(struct bio *bio, unsigned char b)
 {
 	assert(bio != NULL);
 
-	assert(bio->c < CHAR_BIT);
+	assert(bio->c < 32);
 
 	/* do not trust the input, mask the LSB here */
-	bio->b |= (unsigned char)((b & 1) << bio->c);
+	bio->b |= (UINT32)(b & 1) << bio->c;
 
 	bio->c ++;
 
-	if (bio->c == CHAR_BIT) {
+	if (bio->c == 32) {
 		int err = bio_flush_buffer(bio);
 
 		if (err) {
@@ -95,9 +99,9 @@ static size_t bio_put_bits_query(struct bio *bio, size_t n)
 {
 	assert(bio != NULL);
 
-	assert(CHAR_BIT > bio->c);
+	assert(32 > bio->c);
 
-	return size_min(CHAR_BIT - bio->c, n);
+	return size_min(32 - bio->c, n);
 }
 
 /* write n bits */
@@ -105,15 +109,15 @@ static int bio_put_bits(struct bio *bio, UINT32 b, size_t n)
 {
 	assert(bio != NULL);
 
-	assert(bio->c < CHAR_BIT);
+	assert(bio->c < 32);
 
-	assert(CHAR_BIT >= bio->c + n);
+	assert(32 >= bio->c + n);
 
-	bio->b |= (unsigned char)((b & (((UINT32)1 << n) - 1)) << bio->c);
+	bio->b |= (UINT32)((b & (((UINT32)1 << n) - 1)) << bio->c);
 
 	bio->c += n;
 
-	if (bio->c == CHAR_BIT) {
+	if (bio->c == 32) {
 		int err = bio_flush_buffer(bio);
 
 		if (err) {
@@ -131,7 +135,7 @@ static int bio_get_bit(struct bio *bio, unsigned char *b)
 {
 	assert(bio != NULL);
 
-	if (bio->c == CHAR_BIT) {
+	if (bio->c == 32) {
 		int err = bio_reload_buffer(bio);
 
 		if (err) {

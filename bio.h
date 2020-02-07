@@ -15,7 +15,7 @@ enum {
 struct bio {
 	int mode;
 	unsigned char *ptr;
-	unsigned char b; /* buffer */
+	UINT32 b; /* buffer */
 	size_t c; /* counter */
 };
 
