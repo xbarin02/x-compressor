@@ -1,4 +1,4 @@
-CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native -D_POSIX_C_SOURCE=200112L
+CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native #-D_POSIX_C_SOURCE=200112L
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
