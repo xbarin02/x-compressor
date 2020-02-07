@@ -2,7 +2,7 @@ CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native -D_POSIX_C_SOURCE=200112L
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
-BIN=split hist mtf grenc
+BIN=grenc
 
 ifeq ($(BUILD),debug)
 	CFLAGS+=-Og -g
@@ -34,6 +34,8 @@ LDFLAGS+=-flto
 all: $(BIN)
 
 grenc: grenc.o bio.o
+
+bio.o: bio.c bio.h
 
 .PHONY: clean
 clean:
