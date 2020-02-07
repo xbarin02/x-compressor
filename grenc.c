@@ -44,7 +44,7 @@ void init()
 	}
 }
 
-static void ctx_swap(struct ctx *ctx, uchar c, uchar d)
+static void swap(struct ctx *ctx, uchar c, uchar d)
 {
 	uchar ic = ctx->order[c];
 	uchar id = ctx->order[d];
@@ -74,7 +74,7 @@ retry:
 		d = ctx->sorted[ic - 1];
 		if (freq_c > ctx->freq[d]) {
 			/* move c before d */
-			ctx_swap(ctx, c, d);
+			swap(ctx, c, d);
 			goto retry;
 		}
 	}
@@ -95,7 +95,7 @@ retry:
 	d = *(pd + 1);
 
 	if (c != d) {
-		ctx_swap(ctx, c, d);
+		swap(ctx, c, d);
 	}
 #endif
 }
