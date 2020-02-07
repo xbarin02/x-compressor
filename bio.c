@@ -289,8 +289,19 @@ int bio_write_gr_2nd_part(struct bio *bio, size_t k, UINT32 N)
 
 int bio_write_gr(struct bio *bio, size_t k, UINT32 N)
 {
-	bio_write_gr_1st_part(bio, k, N);
-	bio_write_gr_2nd_part(bio, k, N);
+	int err;
+
+	err = bio_write_gr_1st_part(bio, k, N);
+
+	if (err) {
+		return err;
+	}
+
+	err = bio_write_gr_2nd_part(bio, k, N);
+
+	if (err) {
+		return err;
+	}
 
 	return 0;
 }
@@ -327,6 +338,25 @@ int bio_read_gr_2nd_part(struct bio *bio, size_t k, UINT32 *N)
 	assert(N != NULL);
 
 	*N |= w;
+
+	return 0;
+}
+
+int bio_read_gr(struct bio *bio, size_t k, UINT32 *N)
+{
+	int err;
+
+	err = bio_read_gr_1st_part(bio, k, N);
+
+	if (err) {
+		return err;
+	}
+
+	err = bio_read_gr_2nd_part(bio, k, N);
+
+	if (err) {
+		return err;
+	}
 
 	return 0;
 }

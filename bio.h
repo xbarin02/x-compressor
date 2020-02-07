@@ -29,7 +29,6 @@ int bio_read_gr_1st_part(struct bio *bio, size_t k, UINT32 *N);
 int bio_read_gr_2nd_part(struct bio *bio, size_t k, UINT32 *N);
 
 int bio_write_gr(struct bio *bio, size_t k, UINT32 N);
-
-size_t bio_sizeof_gr(size_t k, UINT32 N);
+int bio_read_gr(struct bio *bio, size_t k, UINT32 *N);
 
 #endif /* BIO_H_ */
