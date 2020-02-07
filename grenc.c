@@ -66,25 +66,6 @@ static void swap(struct ctx *ctx, uchar c, uchar d)
 
 static void inc_freq(struct ctx *ctx, uchar c)
 {
-#if 0
-	uchar d;
-	uchar ic;
-
-	size_t freq_c = ++(ctx->freq[c]);
-
-	/* swap? */
-retry:
-	ic = ctx->order[c];
-	if (ic > 0) {
-		d = ctx->sorted[ic - 1];
-		if (freq_c > ctx->freq[d]) {
-			/* move c before d */
-			swap(ctx, c, d);
-			goto retry;
-		}
-	}
-#endif
-#if 1
 	uchar d = c;
 	uchar ic;
 	uchar *pd;
@@ -106,7 +87,6 @@ retry:
 	if (c != d) {
 		swap(ctx, c, d);
 	}
-#endif
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
