@@ -1,8 +1,8 @@
-CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native #-D_POSIX_C_SOURCE=200112L
+CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
-BIN=grenc
+BIN=gr
 
 ifeq ($(BUILD),debug)
 	CFLAGS+=-Og -g
@@ -33,7 +33,7 @@ LDFLAGS+=-flto
 .PHONY: all
 all: $(BIN)
 
-grenc: grenc.o bio.o
+$(BIN): $(BIN).o bio.o
 
 bio.o: bio.c bio.h
 
