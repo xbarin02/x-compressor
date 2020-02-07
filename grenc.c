@@ -126,6 +126,8 @@ void process(uchar *ptr, size_t size, struct bio *bio)
 
 		bio_write_gr(bio, opt_k, (UINT32)d);
 
+		assert(c == ctx->sorted[d]);
+
 		/* update model */
 		inc_freq(ctx, c);
 
