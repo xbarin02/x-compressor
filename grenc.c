@@ -61,7 +61,7 @@ static void ctx_swap(struct ctx *ctx, uchar c, uchar d)
 
 static void inc_freq(struct ctx *ctx, uchar c)
 {
-#if 1
+#if 0
 	uchar d;
 	uchar ic;
 
@@ -79,24 +79,7 @@ retry:
 		}
 	}
 #endif
-#if 0
-	uchar d;
-	uchar ic = ctx->order[c];
-	uchar *pd;
-
-	size_t freq_c = ++(ctx->freq[c]);
-
-	for (pd = ctx->sorted; pd <= ctx->sorted + ic; ++pd) {
-		if (ctx->freq[*pd] < freq_c) {
-			break;
-		}
-	}
-
-	if (c != *pd) {
-		ctx_swap(ctx, c, *pd);
-	}
-#endif
-#if 0
+#if 1
 	uchar d = c;
 	uchar ic = ctx->order[c];
 	uchar *pd;
