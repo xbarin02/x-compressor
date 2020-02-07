@@ -43,4 +43,4 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	-$(RM) -- *.gcda gmon.out
+	-$(RM) -- *.gcda gmon.out cachegrind.out.* callgrind.out.*
