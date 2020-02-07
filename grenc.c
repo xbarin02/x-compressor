@@ -64,7 +64,7 @@ static void swap(struct ctx *ctx, uchar c, uchar d)
 	ctx->order[d] = ic;
 }
 
-static void inc_freq(struct ctx *ctx, uchar c)
+void inc_freq(struct ctx *ctx, uchar c)
 {
 	uchar d = c;
 	uchar ic;
@@ -90,7 +90,7 @@ static void inc_freq(struct ctx *ctx, uchar c)
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
-static void update_model(uchar delta)
+void update_model(uchar delta)
 {
 	if (N == RESET_INTERVAL) {
 		int k;
@@ -133,6 +133,9 @@ void process(uchar *ptr, size_t size, struct bio *bio)
 
 		ctx = table + c;
 	}
+
+	/* EOF symbol */
+	bio_write_gr(bio, opt_k, 256);
 }
 
 void bio_dump(struct bio *bio, void *ptr, FILE *stream)
