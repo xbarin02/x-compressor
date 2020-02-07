@@ -141,51 +141,72 @@ static void update_model(uchar delta)
 	N++;
 }
 
-void process(FILE *istream, struct bio *bio)
+void process(uchar *ptr, size_t size, struct bio *bio)
 {
+	uchar *end = ptr + size;
 	struct ctx *ctx = table + 0;
 
-	do {
-		int c = fgetc(istream);
-		uchar d;
-
-		if (c == EOF) {
-			break;
-		}
-
-		assert(c < 256);
+	for (; ptr < end; ++ptr) {
+		uchar c = *ptr;
 
 		/* get index */
-		d = ctx->order[c];
+		uchar d = ctx->order[c];
 
 		bio_write_gr(bio, opt_k, (UINT32)d);
 
 		/* update model */
-		inc_freq(ctx, (uchar)c);
+		inc_freq(ctx, c);
 
 		update_model(d);
 
 		ctx = table + c;
-	} while (1);
+	}
 }
 
-void bio_dump(struct bio *bio, void *ptr, FILE *bstream)
+void bio_dump(struct bio *bio, void *ptr, FILE *stream)
 {
 	size_t size = bio->ptr - (unsigned char *)ptr;
 
 	printf("coded stream size: %lu bytes\n", (unsigned long)size);
 
-	if (fwrite(ptr, 1, size, bstream) < size) {
+	if (fwrite(ptr, 1, size, stream) < size) {
 		abort();
 	}
+}
+
+void fload(void *ptr, size_t size, FILE *stream)
+{
+	if (fread(ptr, 1, size, stream) < size) {
+		abort();
+	}
+}
+
+size_t fsize(FILE *stream)
+{
+	long size;
+
+	if (fseek(stream, 0, SEEK_END)) {
+		abort();
+	}
+
+	size = ftell(stream);
+
+	if (size == (long)-1) {
+		abort();
+	}
+
+	rewind(stream);
+
+	return (size_t)size;
 }
 
 int main(int argc, char *argv[])
 {
 	FILE *istream = fopen(argc > 1 ? argv[1] : "L", "r");
 	FILE *ostream = fopen(argc > 2 ? argv[2] : "L.gr", "w");
+	size_t isize;
 	struct bio bio;
-	void *ptr = malloc(100000000);
+	void *iptr, *optr;
 
 	if (istream == NULL) {
 		abort();
@@ -195,22 +216,34 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-	if (ptr == NULL) {
+	isize = fsize(istream);
+
+	iptr = malloc(isize);
+	optr = malloc(2 * isize);
+
+	if (iptr == NULL) {
+		abort();
+	}
+
+	if (optr == NULL) {
 		abort();
 	}
 
 	init();
 
-	bio_open(&bio, ptr, BIO_MODE_WRITE);
+	fload(iptr, isize, istream);
 
-	process(istream, &bio);
+	bio_open(&bio, optr, BIO_MODE_WRITE);
+
+	process(iptr, isize, &bio);
 
 	bio_close(&bio);
-	bio_dump(&bio, ptr, ostream);
+	bio_dump(&bio, optr, ostream);
 
 	fclose(istream);
 	fclose(ostream);
-	free(ptr);
+	free(iptr);
+	free(optr);
 
 	return 0;
 }
