@@ -19,9 +19,9 @@ struct ctx {
 	uchar order[256];
 } table[256];
 
-static size_t opt_k = 3;
-static size_t sum_delta = 0;
-static size_t N = 0;
+static size_t opt_k;
+static size_t sum_delta;
+static size_t N;
 
 #define RESET_INTERVAL 256
 
@@ -29,9 +29,14 @@ void init()
 {
 	int p, i, c;
 
+	opt_k = 3;
+	sum_delta = 0;
+	N = 0;
+
 	for (p = 0; p < 256; ++p) {
 		for (i = 0; i < 256; ++i) {
 			table[p].sorted[i] = (uchar)i;
+			table[p].freq[i] = 0;
 		}
 
 		for (c = 0; c < 256; ++c) {
@@ -113,7 +118,7 @@ void update_model(uchar delta)
 	N++;
 }
 
-void process(uchar *ptr, size_t size, struct bio *bio)
+void compress(uchar *ptr, size_t size, struct bio *bio)
 {
 	uchar *end = ptr + size;
 	struct ctx *ctx = table + 0;
@@ -140,15 +145,32 @@ void process(uchar *ptr, size_t size, struct bio *bio)
 	bio_write_gr(bio, opt_k, 256);
 }
 
-void bio_dump(struct bio *bio, void *ptr, FILE *stream)
+void decompress(struct bio *bio, uchar *ptr)
 {
-	size_t size = bio->ptr - (unsigned char *)ptr;
+	struct ctx *ctx = table + 0;
 
-	printf("coded stream size: %lu bytes\n", (unsigned long)size);
+	do {
+		UINT32 d;
+		uchar c;
 
-	if (fwrite(ptr, 1, size, stream) < size) {
-		abort();
-	}
+		bio_read_gr(bio, opt_k, &d);
+
+		if (d == 256) {
+			break;
+		}
+
+		assert(d < 256);
+
+		c = ctx->sorted[d];
+
+		*(ptr++) = c;
+
+		inc_freq(ctx, c);
+
+		update_model(d);
+
+		ctx = table + c;
+	} while (1);
 }
 
 void fload(void *ptr, size_t size, FILE *stream)
@@ -156,6 +178,22 @@ void fload(void *ptr, size_t size, FILE *stream)
 	if (fread(ptr, 1, size, stream) < size) {
 		abort();
 	}
+}
+
+void fsave(void *ptr, size_t size, FILE *stream)
+{
+	if (fwrite(ptr, 1, size, stream) < size) {
+		abort();
+	}
+}
+
+void bio_dump(struct bio *bio, void *ptr, FILE *stream)
+{
+	size_t size = bio->ptr - (unsigned char *)ptr;
+
+	printf("coded stream size: %lu bytes\n", (unsigned long)size);
+
+	fsave(ptr, size, stream);
 }
 
 size_t fsize(FILE *stream)
@@ -212,10 +250,24 @@ int main(int argc, char *argv[])
 
 	bio_open(&bio, optr, BIO_MODE_WRITE);
 
-	process(iptr, isize, &bio);
+	compress(iptr, isize, &bio);
 
 	bio_close(&bio);
 	bio_dump(&bio, optr, ostream);
+
+#if 0
+	{
+		void *xptr = malloc(isize);
+		FILE *xstream = fopen("L.gr.out", "w");
+		init();
+		bio_open(&bio, optr, BIO_MODE_READ);
+		decompress(&bio, xptr);
+		bio_close(&bio);
+		fsave(xptr, isize, xstream);
+		fclose(xstream);
+		free(xptr);
+	}
+#endif
 
 	fclose(istream);
 	fclose(ostream);
