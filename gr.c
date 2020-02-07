@@ -190,7 +190,7 @@ void fsave(void *ptr, size_t size, FILE *stream)
 	}
 }
 
-void fdump(void *end, void *ptr, FILE *stream)
+void fdump(void *ptr, void *end, FILE *stream)
 {
 	size_t size = (uchar *)end - (uchar *)ptr;
 
@@ -287,8 +287,6 @@ int main(int argc, char *argv[])
 		bio_close(&bio);
 
 		end = bio.ptr;
-
-
 	} else {
 		bio_open(&bio, iptr, BIO_MODE_READ);
 
@@ -297,10 +295,11 @@ int main(int argc, char *argv[])
 		bio_close(&bio);
 	}
 
-	fdump(end, optr, ostream);
+	fdump(optr, end, ostream);
 
 	fclose(istream);
 	fclose(ostream);
+
 	free(iptr);
 	free(optr);
 
