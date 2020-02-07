@@ -173,7 +173,7 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 		ctx = table + c;
 	} while (1);
 
-	return ptr + 0;
+	return ptr;
 }
 
 void fload(void *ptr, size_t size, FILE *stream)
@@ -279,13 +279,17 @@ int main(int argc, char *argv[])
 	fload(iptr, isize, istream);
 
 	if (mode == COMPRESS) {
+		uchar *end;
+
 		bio_open(&bio, optr, BIO_MODE_WRITE);
 
 		compress(iptr, isize, &bio);
 
 		bio_close(&bio);
 
-		fdump(bio.ptr, optr, ostream);
+		end = bio.ptr;
+
+		fdump(end, optr, ostream);
 	} else {
 		uchar *end;
 
