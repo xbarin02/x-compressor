@@ -231,6 +231,7 @@ int main(int argc, char *argv[])
 	size_t isize;
 	struct bio bio;
 	void *iptr, *optr;
+	void *end;
 
 	fprintf(stderr, "mode = %s (due to %s)\n", mode == COMPRESS ? "compress" : "decompress", argv[0]);
 
@@ -279,8 +280,6 @@ int main(int argc, char *argv[])
 	fload(iptr, isize, istream);
 
 	if (mode == COMPRESS) {
-		uchar *end;
-
 		bio_open(&bio, optr, BIO_MODE_WRITE);
 
 		compress(iptr, isize, &bio);
@@ -289,18 +288,16 @@ int main(int argc, char *argv[])
 
 		end = bio.ptr;
 
-		fdump(end, optr, ostream);
-	} else {
-		uchar *end;
 
+	} else {
 		bio_open(&bio, iptr, BIO_MODE_READ);
 
 		end = decompress(&bio, optr);
 
 		bio_close(&bio);
-
-		fdump(end, optr, ostream);
 	}
+
+	fdump(end, optr, ostream);
 
 	fclose(istream);
 	fclose(ostream);
