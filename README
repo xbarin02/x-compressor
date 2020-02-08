@@ -12,3 +12,7 @@ Compress:
 Decompress:
 
 ./unx INPUT-FILE [OUTPUT-FILE]
+
+Contact:
+
+David Barina <ibarina@fit.vutbr.cz>
