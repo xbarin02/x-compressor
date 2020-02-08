@@ -19,16 +19,11 @@ struct bio {
 	size_t c; /* counter */
 };
 
-int bio_open(struct bio *bio, unsigned char *ptr, int mode);
-int bio_close(struct bio *bio);
+void bio_open(struct bio *bio, unsigned char *ptr, int mode);
+void bio_close(struct bio *bio);
 
 /* Golomb-Rice, encode/decode non-negative integer N, parameter M = 2^k */
-int bio_write_gr_1st_part(struct bio *bio, size_t k, UINT32 N);
-int bio_write_gr_2nd_part(struct bio *bio, size_t k, UINT32 N);
-int bio_read_gr_1st_part(struct bio *bio, size_t k, UINT32 *N);
-int bio_read_gr_2nd_part(struct bio *bio, size_t k, UINT32 *N);
-
-int bio_write_gr(struct bio *bio, size_t k, UINT32 N);
-int bio_read_gr(struct bio *bio, size_t k, UINT32 *N);
+void bio_write_gr(struct bio *bio, size_t k, UINT32 N);
+void bio_read_gr(struct bio *bio, size_t k, UINT32 *N);
 
 #endif /* BIO_H_ */
