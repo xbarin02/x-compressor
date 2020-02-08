@@ -79,36 +79,6 @@ static size_t size_min(size_t a, size_t b)
 	return a < b ? a : b;
 }
 
-/* we can write at most ... bits out of 'n' */
-static size_t bio_put_bits_query(struct bio *bio, size_t n)
-{
-	assert(bio != NULL);
-
-	assert(bio->c < 32);
-
-	return size_min(32 - bio->c, n);
-}
-
-/* write n bits */
-static void bio_put_bits(struct bio *bio, UINT32 b, size_t n)
-{
-	assert(bio != NULL);
-
-	assert(bio->c < 32);
-
-	assert(32 >= bio->c + n);
-
-	bio->b |= (UINT32)((b & (((UINT32)1 << n) - 1)) << bio->c);
-
-	bio->c += n;
-
-	if (bio->c == 32) {
-		bio_flush_buffer(bio);
-
-		bio_reset_after_flush(bio);
-	}
-}
-
 static size_t ctzu32(UINT32 n)
 {
 	if (n == 0) {
@@ -200,26 +170,6 @@ static void bio_get_bits(struct bio *bio, UINT32 *b, size_t n)
 	*b = w;
 }
 
-/* c' = 32 - c */
-static void bio_get_bit(struct bio *bio, unsigned char *b)
-{
-	assert(bio != NULL);
-
-	if (bio->c == 32) {
-		bio_reload_buffer(bio);
-
-		bio->c = 0;
-	}
-
-	assert(b != NULL);
-
-	*b = bio->b & 1;
-
-	bio->b >>= 1;
-
-	bio->c ++;
-}
-
 static void bio_drop_bit(struct bio *bio)
 {
 	assert(bio != NULL);
@@ -235,10 +185,24 @@ static void bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 {
 	assert(n <= 32);
 
-	for (; n > 0; ) {
-		size_t m = bio_put_bits_query(bio, n);
+	while (n > 0) {
+		size_t m;
 
-		bio_put_bits(bio, b, m);
+		assert(bio->c < 32);
+
+		m = size_min(32 - bio->c, n);
+
+		assert(32 >= bio->c + m);
+
+		bio->b |= (UINT32)((b & (((UINT32)1 << m) - 1)) << bio->c);
+
+		bio->c += m;
+
+		if (bio->c == 32) {
+			bio_flush_buffer(bio);
+
+			bio_reset_after_flush(bio);
+		}
 
 		b >>= m;
 		n -= m;
