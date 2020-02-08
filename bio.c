@@ -133,7 +133,60 @@ static int bio_put_bits(struct bio *bio, UINT32 b, size_t n)
 	return 0;
 }
 
-/* c' = CHAR_BIT - c */
+static size_t ctzu32(UINT32 n)
+{
+	if (n == 0) {
+		return 32;
+	}
+
+	switch (sizeof(UINT32)) {
+		case sizeof(unsigned):
+			return __builtin_ctz((unsigned)n);
+		case sizeof(unsigned long):
+			return __builtin_ctzl((unsigned long)n);
+		default:
+			__builtin_trap();
+	}
+}
+
+static int bio_get_zeros(struct bio *bio, UINT32 *N)
+{
+	/* total zeros */
+	UINT32 t = 0;
+
+	assert(bio != NULL);
+
+	do {
+		/* reload */
+		if (bio->c == 32) {
+			int err = bio_reload_buffer(bio);
+
+			if (err) {
+				return err;
+			}
+
+			bio->c = 0;
+		}
+
+		/* get trailing zeros */
+		{
+			size_t s = size_min(32 - bio->c, ctzu32(bio->b));
+
+			bio->b >>= s;
+			bio->c += s;
+
+			t += s;
+		}
+	} while (bio->c == 32);
+
+	assert(N);
+
+	*N = t;
+
+	return 0;
+}
+
+/* c' = 32 - c */
 static int bio_get_bit(struct bio *bio, unsigned char *b)
 {
 	assert(bio != NULL);
@@ -249,6 +302,7 @@ static int bio_write_unary(struct bio *bio, UINT32 N)
 
 static int bio_read_unary(struct bio *bio, UINT32 *N)
 {
+#if 0
 	UINT32 Q = 0;
 
 	do {
@@ -269,7 +323,24 @@ static int bio_read_unary(struct bio *bio, UINT32 *N)
 	assert(N != NULL);
 
 	*N = Q;
+#else
+	int err;
+	unsigned char b;
 
+	assert(N != NULL);
+
+	err = bio_get_zeros(bio, N);
+
+	if (err) {
+		return err;
+	}
+
+	err = bio_get_bit(bio, &b);
+
+	if (err) {
+		return err;
+	}
+#endif
 	return 0;
 }
 
