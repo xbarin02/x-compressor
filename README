@@ -1,0 +1,14 @@
+experimental data compressor
+============================
+
+Build:
+
+make BUILD=release
+
+Compress:
+
+./x INPUT-FILE [OUTPUT-FILE]
+
+Decompress:
+
+./unx INPUT-FILE [OUTPUT-FILE]
