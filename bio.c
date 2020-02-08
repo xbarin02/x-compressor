@@ -186,6 +186,60 @@ static int bio_get_zeros(struct bio *bio, UINT32 *N)
 	return 0;
 }
 
+static int bio_get_bits(struct bio *bio, UINT32 *b, size_t n)
+{
+	UINT32 w;
+	size_t s;
+	int err;
+
+	/* reload? */
+	if (bio->c == 32) {
+		err = bio_reload_buffer(bio);
+
+		if (err) {
+			return err;
+		}
+
+		bio->c = 0;
+	}
+
+	/* get the least-significant bits */
+	{
+		s = size_min(32 - bio->c, n); /* avail. bits */
+
+		w = bio->b & (((UINT32)1 << s) - 1);
+
+		bio->b >>= s;
+		bio->c += s;
+
+		n -= s;
+	}
+
+	/* need more bits? reload & get the most-significant bits */
+	if (n > 0) {
+		assert(bio->c == 32);
+
+		err = bio_reload_buffer(bio);
+
+		if (err) {
+			return err;
+		}
+
+		bio->c = 0;
+
+		w |= (bio->b & (((UINT32)1 << n) - 1)) << s;
+
+		bio->b >>= n;
+		bio->c += n;
+	}
+
+	assert(b != NULL);
+
+	*b = w;
+
+	return 0;
+}
+
 /* c' = 32 - c */
 static int bio_get_bit(struct bio *bio, unsigned char *b)
 {
@@ -259,6 +313,7 @@ static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 
 static int bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 {
+#if 1
 	size_t i;
 	UINT32 word = 0;
 
@@ -281,6 +336,9 @@ static int bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 	*b = word;
 
 	return 0;
+#else
+	return bio_get_bits(bio, b, n);
+#endif
 }
 
 int bio_close(struct bio *bio)
