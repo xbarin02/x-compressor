@@ -154,7 +154,7 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 		UINT32 d;
 		uchar c;
 
-		bio_read_gr(bio, opt_k, &d);
+		d = bio_read_gr(bio, opt_k);
 
 		if (d == 256) {
 			break;

@@ -249,22 +249,21 @@ void bio_write_gr(struct bio *bio, size_t k, UINT32 N)
 	bio_write_gr_2nd_part(bio, k, N);
 }
 
-void bio_read_gr(struct bio *bio, size_t k, UINT32 *N)
+UINT32 bio_read_gr(struct bio *bio, size_t k)
 {
 	UINT32 Q;
 	UINT32 w;
+	UINT32 N;
 
 	Q = bio_read_unary(bio);
 
-	assert(N != NULL);
-
-	*N = Q << k;
+	N = Q << k;
 
 	assert(k <= 32);
 
 	w = bio_read_bits(bio, k);
 
-	assert(N != NULL);
+	N |= w;
 
-	*N |= w;
+	return N;
 }
