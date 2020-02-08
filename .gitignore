@@ -4,4 +4,5 @@ gmon.out
 cachegrind.out.*
 callgrind.out.*
 
-gr
+x
+unx

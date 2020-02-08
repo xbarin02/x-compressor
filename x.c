@@ -225,7 +225,7 @@ enum {
 
 int main(int argc, char *argv[])
 {
-	int mode = (argc > 0 && strstr(argv[0], "ungr")) ? DECOMPRESS : COMPRESS;
+	int mode = (argc > 0 && strstr(argv[0], "unx")) ? DECOMPRESS : COMPRESS;
 	FILE *istream = argc > 1 ? fopen(argv[1], "r") : stdin;
 	FILE *ostream = argc > 2 ? fopen(argv[2], "w") : stdout;
 	size_t isize;
@@ -240,12 +240,12 @@ int main(int argc, char *argv[])
 		switch (mode) {
 			case COMPRESS:
 				strcpy(path, argv[1]);
-				strcat(path, ".gr");
+				strcat(path, ".x");
 				break;
 			case DECOMPRESS:
 				strcpy(path, argv[1]);
-				if (strcmp(path + strlen(path) - 3, ".gr") == 0) {
-					path[strlen(path) - 3] = 0;
+				if (strcmp(path + strlen(path) - 2, ".x") == 0) {
+					path[strlen(path) - 2] = 0;
 				} else {
 					strcat(path, ".out");
 				}
