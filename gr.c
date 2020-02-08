@@ -194,7 +194,7 @@ void fdump(void *ptr, void *end, FILE *stream)
 {
 	size_t size = (uchar *)end - (uchar *)ptr;
 
-	printf("output stream size: %lu bytes\n", (unsigned long)size);
+	printf("output size: %lu bytes\n", (unsigned long)size);
 
 	fsave(ptr, size, stream);
 }
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 	void *iptr, *optr;
 	void *end;
 
-	fprintf(stderr, "mode = %s (due to %s)\n", mode == COMPRESS ? "compress" : "decompress", argv[0]);
+	fprintf(stderr, "mode: %s\n", mode == COMPRESS ? "compress" : "decompress");
 
 	if (argc == 2) {
 		char path[4096];
@@ -250,7 +250,6 @@ int main(int argc, char *argv[])
 					strcat(path, ".out");
 				}
 		}
-		fprintf(stderr, "output = %s\n", path);
 		ostream = fopen(path, "w");
 	}
 
