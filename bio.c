@@ -313,7 +313,7 @@ static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 
 static int bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 {
-#if 1
+#if 0
 	size_t i;
 	UINT32 word = 0;
 
