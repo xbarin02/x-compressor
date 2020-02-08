@@ -127,49 +127,6 @@ static void bio_get_zeros(struct bio *bio, UINT32 *N)
 	*N = t;
 }
 
-static void bio_get_bits(struct bio *bio, UINT32 *b, size_t n)
-{
-	UINT32 w;
-	size_t s;
-
-	/* reload? */
-	if (bio->c == 32) {
-		bio_reload_buffer(bio);
-
-		bio->c = 0;
-	}
-
-	/* get the least-significant bits */
-	{
-		s = size_min(32 - bio->c, n); /* avail. bits */
-
-		w = bio->b & (((UINT32)1 << s) - 1);
-
-		bio->b >>= s;
-		bio->c += s;
-
-		n -= s;
-	}
-
-	/* need more bits? reload & get the most-significant bits */
-	if (n > 0) {
-		assert(bio->c == 32);
-
-		bio_reload_buffer(bio);
-
-		bio->c = 0;
-
-		w |= (bio->b & (((UINT32)1 << n) - 1)) << s;
-
-		bio->b >>= n;
-		bio->c += n;
-	}
-
-	assert(b != NULL);
-
-	*b = w;
-}
-
 static void bio_drop_bit(struct bio *bio)
 {
 	assert(bio != NULL);
@@ -211,7 +168,45 @@ static void bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 
 static void bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 {
-	bio_get_bits(bio, b, n);
+	UINT32 w;
+	size_t s;
+
+	/* reload? */
+	if (bio->c == 32) {
+		bio_reload_buffer(bio);
+
+		bio->c = 0;
+	}
+
+	/* get the least-significant bits */
+	{
+		s = size_min(32 - bio->c, n); /* avail. bits */
+
+		w = bio->b & (((UINT32)1 << s) - 1);
+
+		bio->b >>= s;
+		bio->c += s;
+
+		n -= s;
+	}
+
+	/* need more bits? reload & get the most-significant bits */
+	if (n > 0) {
+		assert(bio->c == 32);
+
+		bio_reload_buffer(bio);
+
+		bio->c = 0;
+
+		w |= (bio->b & (((UINT32)1 << n) - 1)) << s;
+
+		bio->b >>= n;
+		bio->c += n;
+	}
+
+	assert(b != NULL);
+
+	*b = w;
 }
 
 void bio_close(struct bio *bio)
