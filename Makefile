@@ -2,7 +2,7 @@ CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native
 LDFLAGS=-rdynamic
 LDLIBS=-lm
 
-BIN=gr
+BIN=gr ungr
 
 ifeq ($(BUILD),debug)
 	CFLAGS+=-Og -g
@@ -33,9 +33,12 @@ LDFLAGS+=-flto
 .PHONY: all
 all: $(BIN)
 
-$(BIN): $(BIN).o bio.o
+gr: gr.o bio.o
 
 bio.o: bio.c bio.h
+
+ungr: gr
+	ln -s $< $@
 
 .PHONY: clean
 clean:
