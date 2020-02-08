@@ -283,14 +283,14 @@ static void bio_read_unary(struct bio *bio, UINT32 *N)
 	bio_drop_bit(bio);
 }
 
-void bio_write_gr_1st_part(struct bio *bio, size_t k, UINT32 N)
+static void bio_write_gr_1st_part(struct bio *bio, size_t k, UINT32 N)
 {
 	UINT32 Q = N >> k;
 
 	bio_write_unary(bio, Q);
 }
 
-void bio_write_gr_2nd_part(struct bio *bio, size_t k, UINT32 N)
+static void bio_write_gr_2nd_part(struct bio *bio, size_t k, UINT32 N)
 {
 	assert(k <= 32);
 
@@ -303,7 +303,7 @@ void bio_write_gr(struct bio *bio, size_t k, UINT32 N)
 	bio_write_gr_2nd_part(bio, k, N);
 }
 
-void bio_read_gr_1st_part(struct bio *bio, size_t k, UINT32 *N)
+static void bio_read_gr_1st_part(struct bio *bio, size_t k, UINT32 *N)
 {
 	UINT32 Q;
 
@@ -314,7 +314,7 @@ void bio_read_gr_1st_part(struct bio *bio, size_t k, UINT32 *N)
 	*N = Q << k;
 }
 
-void bio_read_gr_2nd_part(struct bio *bio, size_t k, UINT32 *N)
+static void bio_read_gr_2nd_part(struct bio *bio, size_t k, UINT32 *N)
 {
 	UINT32 w;
 
@@ -331,16 +331,4 @@ void bio_read_gr(struct bio *bio, size_t k, UINT32 *N)
 {
 	bio_read_gr_1st_part(bio, k, N);
 	bio_read_gr_2nd_part(bio, k, N);
-}
-
-size_t bio_sizeof_gr(size_t k, UINT32 N)
-{
-	size_t size;
-	UINT32 Q = N >> k;
-
-	size = Q + 1;
-
-	size += k;
-
-	return size;
 }
