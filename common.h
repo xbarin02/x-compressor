@@ -21,10 +21,4 @@
 #	error "Unable to find 32-bit type"
 #endif
 
-/* NOTE
- * The standard C89 does not have SIZE_MAX.
- * The (size_t)-1 is well defined in C89 under section 6.2.1.2 Signed and unsigned integers.
- */
-#define SIZE_MAX_ ((size_t)-1)
-
 #endif /* COMMON_H_ */
