@@ -216,6 +216,9 @@ static int bio_drop_bit(struct bio *bio)
 {
 	assert(bio != NULL);
 
+	assert(bio->c < 32);
+
+#if 0
 	if (bio->c == 32) {
 		int err = bio_reload_buffer(bio);
 
@@ -225,6 +228,7 @@ static int bio_drop_bit(struct bio *bio)
 
 		bio->c = 0;
 	}
+#endif
 
 	bio->b >>= 1;
 
