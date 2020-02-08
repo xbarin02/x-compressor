@@ -159,7 +159,7 @@ static void bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 	}
 }
 
-static void bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
+static UINT32 bio_read_bits(struct bio *bio, size_t n)
 {
 	UINT32 w;
 	size_t s;
@@ -197,9 +197,7 @@ static void bio_read_bits(struct bio *bio, UINT32 *b, size_t n)
 		bio->c += n;
 	}
 
-	assert(b != NULL);
-
-	*b = w;
+	return w;
 }
 
 void bio_close(struct bio *bio)
@@ -226,11 +224,9 @@ static void bio_write_unary(struct bio *bio, UINT32 N)
 	bio_put_bit(bio, 1);
 }
 
-static void bio_read_unary(struct bio *bio, UINT32 *N)
+static UINT32 bio_read_unary(struct bio *bio)
 {
-	assert(N != NULL);
-
-	*N = bio_get_zeros_and_drop_bit(bio);
+	return bio_get_zeros_and_drop_bit(bio);
 }
 
 static void bio_write_gr_1st_part(struct bio *bio, size_t k, UINT32 N)
@@ -258,7 +254,7 @@ void bio_read_gr(struct bio *bio, size_t k, UINT32 *N)
 	UINT32 Q;
 	UINT32 w;
 
-	bio_read_unary(bio, &Q);
+	Q = bio_read_unary(bio);
 
 	assert(N != NULL);
 
@@ -266,7 +262,7 @@ void bio_read_gr(struct bio *bio, size_t k, UINT32 *N)
 
 	assert(k <= 32);
 
-	bio_read_bits(bio, &w, k);
+	w = bio_read_bits(bio, k);
 
 	assert(N != NULL);
 
