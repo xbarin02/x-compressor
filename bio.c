@@ -212,6 +212,27 @@ static int bio_get_bit(struct bio *bio, unsigned char *b)
 	return 0;
 }
 
+static int bio_drop_bit(struct bio *bio)
+{
+	assert(bio != NULL);
+
+	if (bio->c == 32) {
+		int err = bio_reload_buffer(bio);
+
+		if (err) {
+			return err;
+		}
+
+		bio->c = 0;
+	}
+
+	bio->b >>= 1;
+
+	bio->c ++;
+
+	return 0;
+}
+
 static int bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 {
 	assert(n <= 32);
@@ -325,7 +346,6 @@ static int bio_read_unary(struct bio *bio, UINT32 *N)
 	*N = Q;
 #else
 	int err;
-	unsigned char b;
 
 	assert(N != NULL);
 
@@ -335,7 +355,7 @@ static int bio_read_unary(struct bio *bio, UINT32 *N)
 		return err;
 	}
 
-	err = bio_get_bit(bio, &b);
+	err = bio_drop_bit(bio);
 
 	if (err) {
 		return err;
