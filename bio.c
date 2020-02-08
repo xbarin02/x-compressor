@@ -159,6 +159,31 @@ static void bio_write_bits(struct bio *bio, UINT32 b, size_t n)
 	}
 }
 
+static void bio_write_zero_bits(struct bio *bio, size_t n)
+{
+	assert(n <= 32);
+
+	while (n > 0) {
+		size_t m;
+
+		assert(bio->c < 32);
+
+		m = size_min(32 - bio->c, n);
+
+		assert(32 >= bio->c + m);
+
+		bio->c += m;
+
+		if (bio->c == 32) {
+			bio_flush_buffer(bio);
+
+			bio_reset_after_flush(bio);
+		}
+
+		n -= m;
+	}
+}
+
 static UINT32 bio_read_bits(struct bio *bio, size_t n)
 {
 	UINT32 w;
@@ -211,15 +236,13 @@ void bio_close(struct bio *bio)
 
 static void bio_write_unary(struct bio *bio, UINT32 N)
 {
-	UINT32 b = 0;
-
 	while (N > 32) {
-		bio_write_bits(bio, b, 32);
+		bio_write_zero_bits(bio, 32);
 
 		N -= 32;
 	}
 
-	bio_write_bits(bio, b, N);
+	bio_write_zero_bits(bio, N);
 
 	bio_put_bit(bio, 1);
 }
@@ -229,24 +252,15 @@ static UINT32 bio_read_unary(struct bio *bio)
 	return bio_get_zeros_and_drop_bit(bio);
 }
 
-static void bio_write_gr_1st_part(struct bio *bio, size_t k, UINT32 N)
+void bio_write_gr(struct bio *bio, size_t k, UINT32 N)
 {
 	UINT32 Q = N >> k;
 
 	bio_write_unary(bio, Q);
-}
 
-static void bio_write_gr_2nd_part(struct bio *bio, size_t k, UINT32 N)
-{
 	assert(k <= 32);
 
 	bio_write_bits(bio, N, k);
-}
-
-void bio_write_gr(struct bio *bio, size_t k, UINT32 N)
-{
-	bio_write_gr_1st_part(bio, k, N);
-	bio_write_gr_2nd_part(bio, k, N);
 }
 
 UINT32 bio_read_gr(struct bio *bio, size_t k)
