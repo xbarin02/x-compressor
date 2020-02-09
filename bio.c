@@ -86,13 +86,19 @@ static size_t ctzu32(uint32 n)
 	}
 
 	switch (sizeof(uint32)) {
+		static const int lut[32] = {
+			0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+			31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+		};
+#ifdef __GNUC__
 		case sizeof(unsigned):
 			return __builtin_ctz((unsigned)n);
 		case sizeof(unsigned long):
 			return __builtin_ctzl((unsigned long)n);
+#endif
 		default:
-			/* TODO http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightModLookup */
-			__builtin_trap();
+			/* http://graphics.stanford.edu/~seander/bithacks.html */
+			return lut[((uint32)((n & -n) * 0x077CB531U)) >> 27];
 	}
 }
 
