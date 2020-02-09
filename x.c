@@ -1,8 +1,11 @@
+#define _POSIX_C_SOURCE 2
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <libgen.h>
+#include <unistd.h>
 
 #include "libx.h"
 
@@ -56,24 +59,54 @@ enum {
 
 int main(int argc, char *argv[])
 {
-	int mode = (argc > 0 && strstr(argv[0], "unx")) ? DECOMPRESS : COMPRESS;
-	FILE *istream = argc > 1 ? fopen(argv[1], "r") : stdin;
-	FILE *ostream = argc > 2 ? fopen(argv[2], "w") : stdout;
+	int mode = (argc > 0 && strcmp(basename(argv[0]), "unx") == 0) ? DECOMPRESS : COMPRESS;
+	FILE *istream = NULL;
+	FILE *ostream = NULL;
 	size_t isize;
 	void *iptr, *optr, *end;
 
+	parse: switch (getopt(argc, argv, "zd")) {
+		case 'z':
+			mode = COMPRESS;
+			goto parse;
+		case 'd':
+			mode = DECOMPRESS;
+			goto parse;
+		default:
+			abort();
+		case -1:
+			;
+	}
+
+	switch (argc - optind) {
+		case 0:
+			istream = stdin;
+			ostream = stdout;
+			break;
+		case 1:
+			istream = fopen(argv[optind], "r");
+			break;
+		case 2:
+			istream = fopen(argv[optind+0], "r");
+			ostream = fopen(argv[optind+1], "w");
+			break;
+		default:
+			fprintf(stderr, "Unexpected argument\n");
+			abort();
+	}
+
 	fprintf(stderr, "%s\n", mode == COMPRESS ? "Compressing..." : "Decompressing...");
 
-	if (argc == 2) {
+	if (ostream == NULL) {
 		char path[4096];
 		switch (mode) {
 			case COMPRESS:
-				strcpy(path, argv[1]);
+				strcpy(path, argv[optind]);
 				strcat(path, ".x");
 				break;
 			case DECOMPRESS:
-				strcpy(path, argv[1]);
-				if (strcmp(path + strlen(path) - 2, ".x") == 0) {
+				strcpy(path, argv[optind]);
+				if (strlen(path) > 1 && strcmp(path + strlen(path) - 2, ".x") == 0) {
 					path[strlen(path) - 2] = 0;
 				} else {
 					strcat(path, ".out");
