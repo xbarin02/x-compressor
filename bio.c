@@ -51,13 +51,12 @@ static void bio_reload_buffer(struct bio *bio)
 	bio->ptr += 4;
 }
 
-static void bio_put_bit(struct bio *bio, uchar b)
+static void bio_put_nonzero_bit(struct bio *bio)
 {
 	assert(bio != NULL);
 	assert(bio->c < 32);
 
-	/* do not trust the input, mask the LSB here */
-	bio->b |= (uint32)(b & 1) << bio->c;
+	bio->b |= (uint32)1 << bio->c;
 
 	bio->c ++;
 
@@ -242,7 +241,7 @@ static void bio_write_unary(struct bio *bio, uint32 N)
 
 	bio_write_zero_bits(bio, N);
 
-	bio_put_bit(bio, 1);
+	bio_put_nonzero_bit(bio);
 }
 
 static uint32 bio_read_unary(struct bio *bio)
