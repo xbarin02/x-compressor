@@ -1,5 +1,5 @@
-#ifndef BIO_H_
-#define BIO_H_
+#ifndef LIBX_H_
+#define LIBX_H_
 
 #include <stddef.h>
 
@@ -9,4 +9,4 @@ void init();
 uchar *compress(uchar *iptr, size_t isize, uchar *optr);
 uchar *decompress(uchar *iptr, uchar *optr);
 
-#endif /* BIO_H_ */
+#endif /* LIBX_H_ */

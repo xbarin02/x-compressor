@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "bio.h"
+#include "libx.h"
 
 void fload(void *ptr, size_t size, FILE *stream)
 {

@@ -30,9 +30,9 @@ endif
 .PHONY: all
 all: $(BIN)
 
-x: x.o bio.o
+x: x.o libx.o
 
-bio.o: bio.c bio.h
+libx.o: libx.c libx.h
 
 unx: x
 	ln -s $< $@
