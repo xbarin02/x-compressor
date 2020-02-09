@@ -117,10 +117,13 @@ void update_model(uchar delta)
 	N++;
 }
 
-void compress(uchar *ptr, size_t size, struct bio *bio)
+uchar *compress(uchar *ptr, size_t size, uchar *optr)
 {
+	struct bio bio;
 	uchar *end = ptr + size;
 	struct context *context = table + 0;
+
+	bio_open(&bio, optr, BIO_MODE_WRITE);
 
 	for (; ptr < end; ++ptr) {
 		uchar c = *ptr;
@@ -128,7 +131,7 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 		/* get index */
 		uchar d = context->order[c];
 
-		bio_write_gr(bio, opt_k, (uint32)d);
+		bio_write_gr(&bio, opt_k, (uint32)d);
 
 		assert(c == context->sorted[d]);
 
@@ -142,15 +145,22 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 	}
 
 	/* EOF symbol */
-	bio_write_gr(bio, opt_k, 256);
+	bio_write_gr(&bio, opt_k, 256);
+
+	bio_close(&bio);
+
+	return bio.ptr;
 }
 
-uchar *decompress(struct bio *bio, uchar *ptr)
+uchar *decompress(uchar *iptr, uchar *ptr)
 {
+	struct bio bio;
 	struct context *context = table + 0;
 
+	bio_open(&bio, iptr, BIO_MODE_READ);
+
 	do {
-		uint32 d = bio_read_gr(bio, opt_k);
+		uint32 d = bio_read_gr(&bio, opt_k);
 		uchar c;
 
 		if (d == 256) {
@@ -169,6 +179,8 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 
 		context = table + c;
 	} while (1);
+
+	bio_close(&bio);
 
 	return ptr;
 }
@@ -227,7 +239,6 @@ int main(int argc, char *argv[])
 	FILE *istream = argc > 1 ? fopen(argv[1], "r") : stdin;
 	FILE *ostream = argc > 2 ? fopen(argv[2], "w") : stdout;
 	size_t isize;
-	struct bio bio;
 	void *iptr, *optr;
 	void *end;
 
@@ -283,19 +294,9 @@ int main(int argc, char *argv[])
 	fload(iptr, isize, istream);
 
 	if (mode == COMPRESS) {
-		bio_open(&bio, optr, BIO_MODE_WRITE);
-
-		compress(iptr, isize, &bio);
-
-		bio_close(&bio);
-
-		end = bio.ptr;
+		end = compress(iptr, isize, optr);
 	} else {
-		bio_open(&bio, iptr, BIO_MODE_READ);
-
-		end = decompress(&bio, optr);
-
-		bio_close(&bio);
+		end = decompress(iptr, optr);
 	}
 
 	fdump(optr, end, ostream);
