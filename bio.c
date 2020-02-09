@@ -27,7 +27,7 @@ struct bio {
 	size_t c; /* counter */
 };
 
-struct context {
+static struct context {
 	/* char -> frequency */
 	size_t freq[256];
 
@@ -52,7 +52,7 @@ static void bio_reset_after_flush(struct bio *bio)
 	bio->c = 0;
 }
 
-void bio_open(struct bio *bio, uchar *ptr, int mode)
+static void bio_open(struct bio *bio, uchar *ptr, int mode)
 {
 	assert(bio != NULL);
 	assert(ptr != NULL);
@@ -258,7 +258,7 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 	return w;
 }
 
-void bio_close(struct bio *bio)
+static void bio_close(struct bio *bio)
 {
 	assert(bio != NULL);
 
@@ -357,7 +357,7 @@ static void swap_symbols(struct context *context, uchar c, uchar d)
 	context->order[d] = ic;
 }
 
-void increment_frequency(struct context *context, uchar c)
+static void increment_frequency(struct context *context, uchar c)
 {
 	uchar d = c;
 	uchar ic;
@@ -383,7 +383,7 @@ void increment_frequency(struct context *context, uchar c)
 }
 
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
-void update_model(uchar delta)
+static void update_model(uchar delta)
 {
 	if (N == RESET_INTERVAL) {
 		int k;
