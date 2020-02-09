@@ -3,6 +3,30 @@
 #include <assert.h>
 #include <limits.h>
 
+#define UINT32_MAX_ 4294967295U
+
+#if (USHRT_MAX == UINT32_MAX_)
+typedef unsigned short uint32;
+#elif (UINT_MAX == UINT32_MAX_)
+typedef unsigned uint32;
+#elif (ULONG_MAX == UINT32_MAX_)
+typedef unsigned long uint32;
+#else
+#	error "Unable to find 32-bit type"
+#endif
+
+enum {
+	BIO_MODE_READ,
+	BIO_MODE_WRITE
+};
+
+struct bio {
+	int mode;
+	uchar *ptr;
+	uint32 b; /* buffer */
+	size_t c; /* counter */
+};
+
 struct context {
 	/* char -> frequency */
 	size_t freq[256];
@@ -261,7 +285,8 @@ static uint32 bio_read_unary(struct bio *bio)
 	return bio_get_zeros_and_drop_bit(bio);
 }
 
-void bio_write_gr(struct bio *bio, size_t k, uint32 N)
+/* Golomb-Rice, encode non-negative integer N, parameter M = 2^k */
+static void bio_write_gr(struct bio *bio, size_t k, uint32 N)
 {
 	uint32 Q = N >> k;
 
@@ -272,7 +297,7 @@ void bio_write_gr(struct bio *bio, size_t k, uint32 N)
 	bio_write_bits(bio, N, k);
 }
 
-uint32 bio_read_gr(struct bio *bio, size_t k)
+static uint32 bio_read_gr(struct bio *bio, size_t k)
 {
 	uint32 Q;
 	uint32 N;
