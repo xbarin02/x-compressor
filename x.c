@@ -52,6 +52,16 @@ size_t fsize(FILE *stream)
 	return (size_t)size;
 }
 
+FILE *force_fopen(const char *pathname, const char *mode, int force)
+{
+	if (force == 0 && access(pathname, F_OK) != -1) {
+		fprintf(stderr, "File already exists\n");
+		abort();
+	}
+
+	return fopen(pathname, mode);
+}
+
 enum {
 	COMPRESS,
 	DECOMPRESS
@@ -63,14 +73,18 @@ int main(int argc, char *argv[])
 	FILE *istream = NULL;
 	FILE *ostream = NULL;
 	size_t isize;
+	int force = 0;
 	void *iptr, *optr, *end;
 
-	parse: switch (getopt(argc, argv, "zd")) {
+	parse: switch (getopt(argc, argv, "zdf")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
 		case 'd':
 			mode = DECOMPRESS;
+			goto parse;
+		case 'f':
+			force = 1;
 			goto parse;
 		default:
 			abort();
@@ -88,7 +102,7 @@ int main(int argc, char *argv[])
 			break;
 		case 2:
 			istream = fopen(argv[optind+0], "r");
-			ostream = fopen(argv[optind+1], "w");
+			ostream = force_fopen(argv[optind+1], "w", force);
 			break;
 		default:
 			fprintf(stderr, "Unexpected argument\n");
@@ -112,7 +126,7 @@ int main(int argc, char *argv[])
 					strcat(path, ".out");
 				}
 		}
-		ostream = fopen(path, "w");
+		ostream = force_fopen(path, "w", force);
 	}
 
 	if (istream == NULL) {
