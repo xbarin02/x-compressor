@@ -15,12 +15,10 @@ static void bio_reset_after_flush(struct bio *bio)
 void bio_open(struct bio *bio, unsigned char *ptr, int mode)
 {
 	assert(bio != NULL);
+	assert(ptr != NULL);
 
 	bio->mode = mode;
-
 	bio->ptr = ptr;
-
-	assert(ptr != NULL);
 
 	switch (mode) {
 		case BIO_MODE_READ:
@@ -35,9 +33,7 @@ void bio_open(struct bio *bio, unsigned char *ptr, int mode)
 static void bio_flush_buffer(struct bio *bio)
 {
 	assert(bio != NULL);
-
 	assert(bio->ptr != NULL);
-
 	assert(sizeof(uint32) * CHAR_BIT == 32);
 
 	*((uint32 *)bio->ptr) = bio->b;
@@ -48,7 +44,6 @@ static void bio_flush_buffer(struct bio *bio)
 static void bio_reload_buffer(struct bio *bio)
 {
 	assert(bio != NULL);
-
 	assert(bio->ptr != NULL);
 
 	bio->b = *(uint32 *)bio->ptr;
@@ -59,7 +54,6 @@ static void bio_reload_buffer(struct bio *bio)
 static void bio_put_bit(struct bio *bio, unsigned char b)
 {
 	assert(bio != NULL);
-
 	assert(bio->c < 32);
 
 	/* do not trust the input, mask the LSB here */

@@ -149,10 +149,8 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 	struct ctx *ctx = table + 0;
 
 	do {
-		uint32 d;
+		uint32 d = bio_read_gr(bio, opt_k);
 		uchar c;
-
-		d = bio_read_gr(bio, opt_k);
 
 		if (d == 256) {
 			break;
