@@ -117,16 +117,16 @@ void update_model(uchar delta)
 	N++;
 }
 
-uchar *compress(uchar *ptr, size_t size, uchar *optr)
+uchar *compress(uchar *iptr, size_t isize, uchar *optr)
 {
 	struct bio bio;
-	uchar *end = ptr + size;
+	uchar *end = iptr + isize;
 	struct context *context = table + 0;
 
 	bio_open(&bio, optr, BIO_MODE_WRITE);
 
-	for (; ptr < end; ++ptr) {
-		uchar c = *ptr;
+	for (; iptr < end; ++iptr) {
+		uchar c = *iptr;
 
 		/* get index */
 		uchar d = context->order[c];
@@ -152,7 +152,7 @@ uchar *compress(uchar *ptr, size_t size, uchar *optr)
 	return bio.ptr;
 }
 
-uchar *decompress(uchar *iptr, uchar *ptr)
+uchar *decompress(uchar *iptr, uchar *optr)
 {
 	struct bio bio;
 	struct context *context = table + 0;
@@ -171,7 +171,7 @@ uchar *decompress(uchar *iptr, uchar *ptr)
 
 		c = context->sorted[d];
 
-		*(ptr++) = c;
+		*(optr++) = c;
 
 		increment_frequency(context, c);
 
@@ -182,7 +182,7 @@ uchar *decompress(uchar *iptr, uchar *ptr)
 
 	bio_close(&bio);
 
-	return ptr;
+	return optr;
 }
 
 void fload(void *ptr, size_t size, FILE *stream)
