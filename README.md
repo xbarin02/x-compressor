@@ -4,21 +4,21 @@ x &ndash; minimalist data compressor
 Why?
 ----
 
-The **x** is easily verifiable and portable lossless data compressor.
+The **x** is an easily verifiable and portable lossless data compressor.
 Source codes count less than 700 lines in total.
 A core library is less than 500 lines in pure C89.
 
 Benchmarks
 ----------
 
-Benchmark evaluates the compression of reference [enwik8] file.
+Benchmark evaluates the compression of the reference [enwik8] file.
 All compressors have been compiled with GCC 9.2 on 64-bit Linux.
-The reference system uses a AMD Ryzen Threadripper 2990WX.
+The reference system uses an AMD Ryzen Threadripper 2990WX.
 All measurements use default settings (no extra arguments).
-The ellapsed Compression and Decompression times (wall clock) are given in seconds.
+The elapsed Compression and Decompression times (wall clock) are given in seconds.
 The compression Ratio is given as uncompressed/compressed (more is better).
 SLOC means Source Lines Of Code.
-Bold font indicates best result.
+Bold font indicates the best result.
 
 [enwik8]: http://prize.hutter1.net/
 
