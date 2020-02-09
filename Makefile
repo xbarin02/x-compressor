@@ -1,6 +1,6 @@
 CFLAGS=-std=c89 -pedantic -Wall -Wextra -march=native
-LDFLAGS=-rdynamic
-LDLIBS=-lm
+LDFLAGS=
+LDLIBS=
 
 BIN=x unx
 
