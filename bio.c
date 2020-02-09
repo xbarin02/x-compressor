@@ -203,16 +203,14 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 	}
 
 	/* get the least-significant bits */
-	{
-		s = size_min(32 - bio->c, n); /* avail. bits */
+	s = size_min(32 - bio->c, n); /* avail. bits */
 
-		w = bio->b & (((uint32)1 << s) - 1);
+	w = bio->b & (((uint32)1 << s) - 1);
 
-		bio->b >>= s;
-		bio->c += s;
+	bio->b >>= s;
+	bio->c += s;
 
-		n -= s;
-	}
+	n -= s;
 
 	/* need more bits? reload & get the most-significant bits */
 	if (n > 0) {
@@ -272,7 +270,6 @@ void bio_write_gr(struct bio *bio, size_t k, uint32 N)
 uint32 bio_read_gr(struct bio *bio, size_t k)
 {
 	uint32 Q;
-	uint32 w;
 	uint32 N;
 
 	Q = bio_read_unary(bio);
@@ -281,9 +278,7 @@ uint32 bio_read_gr(struct bio *bio, size_t k)
 
 	assert(k <= 32);
 
-	w = bio_read_bits(bio, k);
-
-	N |= w;
+	N |= bio_read_bits(bio, k);
 
 	return N;
 }
