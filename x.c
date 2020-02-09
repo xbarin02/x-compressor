@@ -204,6 +204,7 @@ size_t fsize(FILE *stream)
 	long size;
 
 	if (fseek(stream, 0, SEEK_END)) {
+		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
@@ -254,10 +255,12 @@ int main(int argc, char *argv[])
 	}
 
 	if (istream == NULL) {
+		fprintf(stderr, "Cannot open input file\n");
 		abort();
 	}
 
 	if (ostream == NULL) {
+		fprintf(stderr, "Cannot open output file\n");
 		abort();
 	}
 
@@ -267,10 +270,12 @@ int main(int argc, char *argv[])
 	optr = malloc(8 * isize);
 
 	if (iptr == NULL) {
+		fprintf(stderr, "Out of memory\n");
 		abort();
 	}
 
 	if (optr == NULL) {
+		fprintf(stderr, "Out of memory\n");
 		abort();
 	}
 
