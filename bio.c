@@ -58,16 +58,15 @@ static void bio_put_nonzero_bit(struct bio *bio)
 
 	bio->b |= (uint32)1 << bio->c;
 
-	bio->c ++;
+	bio->c++;
 
 	if (bio->c == 32) {
 		bio_flush_buffer(bio);
-
 		bio_reset_after_flush(bio);
 	}
 }
 
-static size_t size_min(size_t a, size_t b)
+static size_t minsize(size_t a, size_t b)
 {
 	return a < b ? a : b;
 }
@@ -97,15 +96,14 @@ static size_t ctzu32(uint32 n)
 
 static uint32 bio_get_zeros_and_drop_bit(struct bio *bio)
 {
-	/* total zeros */
-	uint32 t = 0;
+	uint32 total_zeros = 0;
 
 	assert(bio != NULL);
 
 	do {
 		size_t s;
 
-		/* reload */
+		/* reload? */
 		if (bio->c == 32) {
 			bio_reload_buffer(bio);
 
@@ -113,21 +111,21 @@ static uint32 bio_get_zeros_and_drop_bit(struct bio *bio)
 		}
 
 		/* get trailing zeros */
-		s = size_min(32 - bio->c, ctzu32(bio->b));
+		s = minsize(32 - bio->c, ctzu32(bio->b));
 
 		bio->b >>= s;
 		bio->c += s;
 
-		t += s;
+		total_zeros += s;
 	} while (bio->c == 32);
 
 	assert(bio->c < 32);
 
 	bio->b >>= 1;
 
-	bio->c ++;
+	bio->c++;
 
-	return t;
+	return total_zeros;
 }
 
 static void bio_write_bits(struct bio *bio, uint32 b, size_t n)
@@ -139,7 +137,7 @@ static void bio_write_bits(struct bio *bio, uint32 b, size_t n)
 
 		assert(bio->c < 32);
 
-		m = size_min(32 - bio->c, n);
+		m = minsize(32 - bio->c, n);
 
 		assert(32 >= bio->c + m);
 
@@ -149,7 +147,6 @@ static void bio_write_bits(struct bio *bio, uint32 b, size_t n)
 
 		if (bio->c == 32) {
 			bio_flush_buffer(bio);
-
 			bio_reset_after_flush(bio);
 		}
 
@@ -167,7 +164,7 @@ static void bio_write_zero_bits(struct bio *bio, size_t n)
 
 		assert(bio->c < 32);
 
-		m = size_min(32 - bio->c, n);
+		m = minsize(32 - bio->c, n);
 
 		assert(32 >= bio->c + m);
 
@@ -175,7 +172,6 @@ static void bio_write_zero_bits(struct bio *bio, size_t n)
 
 		if (bio->c == 32) {
 			bio_flush_buffer(bio);
-
 			bio_reset_after_flush(bio);
 		}
 
@@ -196,7 +192,7 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 	}
 
 	/* get the least-significant bits */
-	s = size_min(32 - bio->c, n); /* avail. bits */
+	s = minsize(32 - bio->c, n); /* avail. bits */
 
 	w = bio->b & (((uint32)1 << s) - 1);
 
