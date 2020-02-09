@@ -128,7 +128,7 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 		/* get index */
 		uchar d = ctx->order[c];
 
-		bio_write_gr(bio, opt_k, (UINT32)d);
+		bio_write_gr(bio, opt_k, (uint32)d);
 
 		assert(c == ctx->sorted[d]);
 
@@ -149,7 +149,7 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 	struct ctx *ctx = table + 0;
 
 	do {
-		UINT32 d;
+		uint32 d;
 		uchar c;
 
 		d = bio_read_gr(bio, opt_k);

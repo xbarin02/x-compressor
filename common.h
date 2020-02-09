@@ -7,11 +7,11 @@
 #define UINT32_MAX_ 4294967295U
 
 #if (USHRT_MAX == UINT32_MAX_)
-typedef unsigned short UINT32;
+typedef unsigned short uint32;
 #elif (UINT_MAX == UINT32_MAX_)
-typedef unsigned UINT32;
+typedef unsigned uint32;
 #elif (ULONG_MAX == UINT32_MAX_)
-typedef unsigned long UINT32;
+typedef unsigned long uint32;
 #else
 #	error "Unable to find 32-bit type"
 #endif

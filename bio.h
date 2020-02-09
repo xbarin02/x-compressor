@@ -15,7 +15,7 @@ enum {
 struct bio {
 	int mode;
 	unsigned char *ptr;
-	UINT32 b; /* buffer */
+	uint32 b; /* buffer */
 	size_t c; /* counter */
 };
 
@@ -23,7 +23,7 @@ void bio_open(struct bio *bio, unsigned char *ptr, int mode);
 void bio_close(struct bio *bio);
 
 /* Golomb-Rice, encode/decode non-negative integer N, parameter M = 2^k */
-void bio_write_gr(struct bio *bio, size_t k, UINT32 N);
-UINT32 bio_read_gr(struct bio *bio, size_t k);
+void bio_write_gr(struct bio *bio, size_t k, uint32 N);
+uint32 bio_read_gr(struct bio *bio, size_t k);
 
 #endif /* BIO_H_ */
