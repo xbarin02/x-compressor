@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 	void *iptr, *optr;
 	void *end;
 
-	fprintf(stderr, "mode: %s\n", mode == COMPRESS ? "compress" : "decompress");
+	fprintf(stderr, "%s\n", mode == COMPRESS ? "Compressing..." : "Decompressing...");
 
 	if (argc == 2) {
 		char path[4096];
@@ -261,6 +261,8 @@ int main(int argc, char *argv[])
 	}
 
 	isize = fsize(istream);
+
+	printf("input size: %lu bytes\n", (unsigned long)isize);
 
 	iptr = malloc(isize);
 	optr = malloc(8 * isize);
