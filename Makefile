@@ -44,3 +44,19 @@ clean:
 .PHONY: distclean
 distclean: clean
 	-$(RM) -- *.gcda gmon.out cachegrind.out.* callgrind.out.*
+
+.PHONY: build-pgo
+build-pgo:
+	$(MAKE) distclean all BUILD=profile-generate
+	./x -f libx.c
+	./unx -f libx.c.x libx.c.x.out
+	diff libx.c libx.c.x.out
+	$(MAKE) clean all BUILD=profile-use
+	-$(RM) -- libx.c.x libx.c.x.out
+
+.PHONY: check
+check: all
+	./x -f libx.c
+	./unx -f libx.c.x libx.c.x.out
+	diff libx.c libx.c.x.out
+	-$(RM) -- libx.c.x libx.c.x.out
