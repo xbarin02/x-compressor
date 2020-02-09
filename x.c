@@ -24,7 +24,7 @@ void fdump(void *ptr, void *end, FILE *stream)
 {
 	size_t size = (uchar *)end - (uchar *)ptr;
 
-	printf("output size: %lu bytes\n", (unsigned long)size);
+	printf("Output size: %lu bytes\n", (unsigned long)size);
 
 	fsave(ptr, size, stream);
 }
@@ -60,8 +60,7 @@ int main(int argc, char *argv[])
 	FILE *istream = argc > 1 ? fopen(argv[1], "r") : stdin;
 	FILE *ostream = argc > 2 ? fopen(argv[2], "w") : stdout;
 	size_t isize;
-	void *iptr, *optr;
-	void *end;
+	void *iptr, *optr, *end;
 
 	fprintf(stderr, "%s\n", mode == COMPRESS ? "Compressing..." : "Decompressing...");
 
@@ -95,7 +94,7 @@ int main(int argc, char *argv[])
 
 	isize = fsize(istream);
 
-	printf("input size: %lu bytes\n", (unsigned long)isize);
+	printf("Input size: %lu bytes\n", (unsigned long)isize);
 
 	iptr = malloc(isize);
 	optr = malloc(8 * isize);
