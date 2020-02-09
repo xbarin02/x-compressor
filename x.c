@@ -67,6 +67,16 @@ enum {
 	DECOMPRESS
 };
 
+void print_help(char *path)
+{
+	fprintf(stderr, "Usage :\n\t%s [arguments] [input-file] [output-file]\n\n", path);
+	fprintf(stderr, "Arguments :\n");
+	fprintf(stderr, " -d     : force decompression\n");
+	fprintf(stderr, " -z     : force compression\n");
+	fprintf(stderr, " -f     : overwrite existing output files\n");
+	fprintf(stderr, " -h     : print this message\n");
+}
+
 int main(int argc, char *argv[])
 {
 	int mode = (argc > 0 && strcmp(basename(argv[0]), "unx") == 0) ? DECOMPRESS : COMPRESS;
@@ -76,7 +86,7 @@ int main(int argc, char *argv[])
 	int force = 0;
 	void *iptr, *optr, *end;
 
-	parse: switch (getopt(argc, argv, "zdf")) {
+	parse: switch (getopt(argc, argv, "zdfh")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
@@ -86,6 +96,9 @@ int main(int argc, char *argv[])
 		case 'f':
 			force = 1;
 			goto parse;
+		case 'h':
+			print_help(argv[0]);
+			return 0;
 		default:
 			abort();
 		case -1:
