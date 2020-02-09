@@ -1,0 +1,4 @@
+language: C
+sudo: false
+script:
+  - make check BUILD=debug
