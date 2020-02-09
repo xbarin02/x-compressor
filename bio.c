@@ -1,8 +1,24 @@
 #include "bio.h"
-#include "common.h"
 
 #include <assert.h>
 #include <limits.h>
+
+struct context {
+	/* char -> frequency */
+	size_t freq[256];
+
+	/* index -> char */
+	uchar sorted[256];
+
+	/* char -> index */
+	uchar order[256];
+} table[256];
+
+static size_t opt_k;
+static size_t sum_delta;
+static size_t N;
+
+#define RESET_INTERVAL 256
 
 static void bio_reset_after_flush(struct bio *bio)
 {
@@ -270,4 +286,165 @@ uint32 bio_read_gr(struct bio *bio, size_t k)
 	N |= bio_read_bits(bio, k);
 
 	return N;
+}
+
+void init()
+{
+	int p, i, c;
+
+	opt_k = 3;
+	sum_delta = 0;
+	N = 0;
+
+	for (p = 0; p < 256; ++p) {
+		for (i = 0; i < 256; ++i) {
+			table[p].sorted[i] = (uchar)i;
+			table[p].freq[i] = 0;
+		}
+
+		for (c = 0; c < 256; ++c) {
+			for (i = 0; i < 256; ++i) {
+				if (table[p].sorted[i] == c) {
+					table[p].order[c] = (uchar)i;
+				}
+			}
+		}
+	}
+}
+
+static void swap_symbols(struct context *context, uchar c, uchar d)
+{
+	uchar ic;
+	uchar id;
+
+	assert(context != NULL);
+
+	ic = context->order[c];
+	id = context->order[d];
+
+	assert(context->sorted[ic] == c);
+	assert(context->sorted[id] == d);
+
+	context->sorted[ic] = d;
+	context->sorted[id] = c;
+
+	context->order[c] = id;
+	context->order[d] = ic;
+}
+
+void increment_frequency(struct context *context, uchar c)
+{
+	uchar d = c;
+	uchar ic;
+	uchar *pd;
+	size_t freq_c;
+
+	assert(context != NULL);
+
+	ic = context->order[c];
+	freq_c = ++(context->freq[c]);
+
+	for (pd = context->sorted + ic - 1; pd >= context->sorted; --pd) {
+		if (freq_c <= context->freq[*pd]) {
+			break;
+		}
+	}
+
+	d = *(pd + 1);
+
+	if (c != d) {
+		swap_symbols(context, c, d);
+	}
+}
+
+/* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
+void update_model(uchar delta)
+{
+	if (N == RESET_INTERVAL) {
+		int k;
+
+		/* mean = E{delta} = sum_delta / N */
+
+		/* 2^k <= E{r[k]} + 0 */
+		for (k = 1; (N << k) <= sum_delta; ++k)
+			;
+
+		--k;
+
+		opt_k = k;
+
+		N = 0;
+		sum_delta = 0;
+	}
+
+	sum_delta += delta;
+	N++;
+}
+
+uchar *compress(uchar *iptr, size_t isize, uchar *optr)
+{
+	struct bio bio;
+	uchar *end = iptr + isize;
+	struct context *context = table + 0;
+
+	bio_open(&bio, optr, BIO_MODE_WRITE);
+
+	for (; iptr < end; ++iptr) {
+		uchar c = *iptr;
+
+		/* get index */
+		uchar d = context->order[c];
+
+		bio_write_gr(&bio, opt_k, (uint32)d);
+
+		assert(c == context->sorted[d]);
+
+		/* update context model */
+		increment_frequency(context, c);
+
+		/* update Golomb-Rice model */
+		update_model(d);
+
+		context = table + c;
+	}
+
+	/* EOF symbol */
+	bio_write_gr(&bio, opt_k, 256);
+
+	bio_close(&bio);
+
+	return bio.ptr;
+}
+
+uchar *decompress(uchar *iptr, uchar *optr)
+{
+	struct bio bio;
+	struct context *context = table + 0;
+
+	bio_open(&bio, iptr, BIO_MODE_READ);
+
+	do {
+		uint32 d = bio_read_gr(&bio, opt_k);
+		uchar c;
+
+		if (d == 256) {
+			break;
+		}
+
+		assert(d < 256);
+
+		c = context->sorted[d];
+
+		*(optr++) = c;
+
+		increment_frequency(context, c);
+
+		update_model(d);
+
+		context = table + c;
+	} while (1);
+
+	bio_close(&bio);
+
+	return optr;
 }
