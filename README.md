@@ -24,7 +24,7 @@ Bold font indicates the best result.
 
 |  Compressor             | Ratio    | Compression time | Decompression time | SLOC    |
 |  ----------             | -----    | ---------------- | ------------------ | ----    |
-|  x                      | 1.88     | 1.11             | 0.98               | **678** |
+|  x                      | 1.88     | 1.10             | 0.96               | **678** |
 |  bzip2 1.0.6            | **3.45** | 7.39             | 3.36               | 8117    |
 |  lzop 1.04              | 1.78     | 0.36             | 0.33               | 17123   |
 |  lz4 1.9.2              | 1.75     | **0.29**         | **0.11**           | 20619   |
@@ -40,6 +40,12 @@ How to build?
 
 ```
 make BUILD=release
+```
+
+or
+
+```
+make BUILD=build-pgo
 ```
 
 How to use?
