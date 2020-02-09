@@ -14,12 +14,12 @@ enum {
 
 struct bio {
 	int mode;
-	unsigned char *ptr;
+	uchar *ptr;
 	uint32 b; /* buffer */
 	size_t c; /* counter */
 };
 
-void bio_open(struct bio *bio, unsigned char *ptr, int mode);
+void bio_open(struct bio *bio, uchar *ptr, int mode);
 void bio_close(struct bio *bio);
 
 /* Golomb-Rice, encode/decode non-negative integer N, parameter M = 2^k */

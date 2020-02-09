@@ -12,7 +12,7 @@ static void bio_reset_after_flush(struct bio *bio)
 	bio->c = 0;
 }
 
-void bio_open(struct bio *bio, unsigned char *ptr, int mode)
+void bio_open(struct bio *bio, uchar *ptr, int mode)
 {
 	assert(bio != NULL);
 	assert(ptr != NULL);
@@ -51,7 +51,7 @@ static void bio_reload_buffer(struct bio *bio)
 	bio->ptr += 4;
 }
 
-static void bio_put_bit(struct bio *bio, unsigned char b)
+static void bio_put_bit(struct bio *bio, uchar b)
 {
 	assert(bio != NULL);
 	assert(bio->c < 32);
