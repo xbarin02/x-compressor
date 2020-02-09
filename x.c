@@ -7,7 +7,7 @@
 #include "common.h"
 #include "bio.h"
 
-struct ctx {
+struct context {
 	/* char -> frequency */
 	size_t freq[256];
 
@@ -48,40 +48,40 @@ void init()
 	}
 }
 
-static void swap(struct ctx *ctx, uchar c, uchar d)
+static void swap_symbols(struct context *context, uchar c, uchar d)
 {
 	uchar ic;
 	uchar id;
 
-	assert(ctx != NULL);
+	assert(context != NULL);
 
-	ic = ctx->order[c];
-	id = ctx->order[d];
+	ic = context->order[c];
+	id = context->order[d];
 
-	assert(ctx->sorted[ic] == c);
-	assert(ctx->sorted[id] == d);
+	assert(context->sorted[ic] == c);
+	assert(context->sorted[id] == d);
 
-	ctx->sorted[ic] = d;
-	ctx->sorted[id] = c;
+	context->sorted[ic] = d;
+	context->sorted[id] = c;
 
-	ctx->order[c] = id;
-	ctx->order[d] = ic;
+	context->order[c] = id;
+	context->order[d] = ic;
 }
 
-void inc_freq(struct ctx *ctx, uchar c)
+void increment_frequency(struct context *context, uchar c)
 {
 	uchar d = c;
 	uchar ic;
 	uchar *pd;
 	size_t freq_c;
 
-	assert(ctx != NULL);
+	assert(context != NULL);
 
-	ic = ctx->order[c];
-	freq_c = ++(ctx->freq[c]);
+	ic = context->order[c];
+	freq_c = ++(context->freq[c]);
 
-	for (pd = ctx->sorted + ic - 1; pd >= ctx->sorted; --pd) {
-		if (freq_c <= ctx->freq[*pd]) {
+	for (pd = context->sorted + ic - 1; pd >= context->sorted; --pd) {
+		if (freq_c <= context->freq[*pd]) {
 			break;
 		}
 	}
@@ -89,7 +89,7 @@ void inc_freq(struct ctx *ctx, uchar c)
 	d = *(pd + 1);
 
 	if (c != d) {
-		swap(ctx, c, d);
+		swap_symbols(context, c, d);
 	}
 }
 
@@ -120,25 +120,25 @@ void update_model(uchar delta)
 void compress(uchar *ptr, size_t size, struct bio *bio)
 {
 	uchar *end = ptr + size;
-	struct ctx *ctx = table + 0;
+	struct context *context = table + 0;
 
 	for (; ptr < end; ++ptr) {
 		uchar c = *ptr;
 
 		/* get index */
-		uchar d = ctx->order[c];
+		uchar d = context->order[c];
 
 		bio_write_gr(bio, opt_k, (uint32)d);
 
-		assert(c == ctx->sorted[d]);
+		assert(c == context->sorted[d]);
 
 		/* update context model */
-		inc_freq(ctx, c);
+		increment_frequency(context, c);
 
 		/* update Golomb-Rice model */
 		update_model(d);
 
-		ctx = table + c;
+		context = table + c;
 	}
 
 	/* EOF symbol */
@@ -147,7 +147,7 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 
 uchar *decompress(struct bio *bio, uchar *ptr)
 {
-	struct ctx *ctx = table + 0;
+	struct context *context = table + 0;
 
 	do {
 		uint32 d = bio_read_gr(bio, opt_k);
@@ -159,15 +159,15 @@ uchar *decompress(struct bio *bio, uchar *ptr)
 
 		assert(d < 256);
 
-		c = ctx->sorted[d];
+		c = context->sorted[d];
 
 		*(ptr++) = c;
 
-		inc_freq(ctx, c);
+		increment_frequency(context, c);
 
 		update_model(d);
 
-		ctx = table + c;
+		context = table + c;
 	} while (1);
 
 	return ptr;
