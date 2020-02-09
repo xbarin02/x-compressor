@@ -132,9 +132,10 @@ void compress(uchar *ptr, size_t size, struct bio *bio)
 
 		assert(c == ctx->sorted[d]);
 
-		/* update model */
+		/* update context model */
 		inc_freq(ctx, c);
 
+		/* update Golomb-Rice model */
 		update_model(d);
 
 		ctx = table + c;

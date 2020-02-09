@@ -191,8 +191,8 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 		bio->c = 0;
 	}
 
-	/* get the least-significant bits */
-	s = minsize(32 - bio->c, n); /* avail. bits */
+	/* get the avail. least-significant bits */
+	s = minsize(32 - bio->c, n);
 
 	w = bio->b & (((uint32)1 << s) - 1);
 
