@@ -1,7 +1,7 @@
 x &ndash; minimalist data compressor
 ====================================
 
-[![Build Status](https://travis-ci.org/xbarin02/x-compressor.svg?branch=master)](https://travis-ci.com/xbarin02/x-compressor)
+[![Build Status](https://travis-ci.org/xbarin02/x-compressor.svg?branch=master)](https://travis-ci.org/xbarin02/x-compressor)
 
 Why?
 ----
