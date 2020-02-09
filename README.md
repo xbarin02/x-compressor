@@ -21,13 +21,13 @@ SLOC means Source Lines Of Code.
 
 [enwik8]: http://prize.hutter1.net/
 
-|  Compressor             | Ratio   | Compression | Decompression | SLOC |
-|  ----------             | -----   | ----------- | ------------- | ---- |
-|  x                      | 1.88    | 1.11        | 0.98          | 678  |
-|  lz4                    | 1.75    | 0.29        | 0.11          |      |
-|  lzop                   | 1.78    | 0.36        | 0.33          |      |
-|  gzip                   | 2.74    | 4.69        | 0.63          |      |
-|  bzip2                  | 3.45    | 7.39        | 3.36          |      |
+|  Compressor             | Ratio | Compression | Decompression | SLOC  |
+|  ----------             | ----- | ----------- | ------------- | ----  |
+|  x                      | 1.88  | 1.11        | 0.98          |   678 |
+|  bzip2 1.0.6            | 3.45  | 7.39        | 3.36          |  8117 |
+|  lzop 1.04              | 1.78  | 0.36        | 0.33          | 17123 |
+|  lz4 1.9.2              | 1.75  | 0.29        | 0.11          | 20619 |
+|  gzip 1.9               | 2.74  | 4.69        | 0.63          | 48552 |
 
 How to build?
 -------------
@@ -54,4 +54,4 @@ Decompress:
 Author
 ------
 
-David Barina <ibarina@fit.vutbr.cz>
+- [David Barina](mailto:ibarina@fit.vutbr.cz)
