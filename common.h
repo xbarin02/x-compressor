@@ -7,13 +7,15 @@
 #define UINT32_MAX_ 4294967295U
 
 #if (USHRT_MAX == UINT32_MAX_)
-#	define UINT32 unsigned short
+typedef unsigned short UINT32;
 #elif (UINT_MAX == UINT32_MAX_)
-#	define UINT32 unsigned
+typedef unsigned UINT32;
 #elif (ULONG_MAX == UINT32_MAX_)
-#	define UINT32 unsigned long
+typedef unsigned long UINT32;
 #else
 #	error "Unable to find 32-bit type"
 #endif
+
+typedef unsigned char uchar;
 
 #endif /* COMMON_H_ */

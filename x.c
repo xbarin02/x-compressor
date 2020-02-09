@@ -7,8 +7,6 @@
 #include "common.h"
 #include "bio.h"
 
-typedef unsigned char uchar;
-
 struct ctx {
 	/* char -> frequency */
 	size_t freq[256];
