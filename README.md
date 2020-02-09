@@ -18,16 +18,17 @@ All measurements use default settings (no extra arguments).
 The ellapsed Compression and Decompression times (wall clock) are given in seconds.
 The compression Ratio is given as uncompressed/compressed (more is better).
 SLOC means Source Lines Of Code.
+Bold font indicates best result.
 
 [enwik8]: http://prize.hutter1.net/
 
-|  Compressor             | Ratio | Compression | Decompression | SLOC  |
-|  ----------             | ----- | ----------- | ------------- | ----  |
-|  x                      | 1.88  | 1.11        | 0.98          |   678 |
-|  bzip2 1.0.6            | 3.45  | 7.39        | 3.36          |  8117 |
-|  lzop 1.04              | 1.78  | 0.36        | 0.33          | 17123 |
-|  lz4 1.9.2              | 1.75  | 0.29        | 0.11          | 20619 |
-|  gzip 1.9               | 2.74  | 4.69        | 0.63          | 48552 |
+|  Compressor             | Ratio    | Compression time | Decompression time | SLOC    |
+|  ----------             | -----    | ---------------- | ------------------ | ----    |
+|  x                      | 1.88     | 1.11             | 0.98               | **678** |
+|  bzip2 1.0.6            | **3.45** | 7.39             | 3.36               | 8117    |
+|  lzop 1.04              | 1.78     | 0.36             | 0.33               | 17123   |
+|  lz4 1.9.2              | 1.75     | **0.29**         | **0.11**           | 20619   |
+|  gzip 1.9               | 2.74     | 4.69             | 0.63               | 48552   |
 
 How to build?
 -------------
