@@ -30,6 +30,11 @@ Bold font indicates best result.
 |  lz4 1.9.2              | 1.75     | **0.29**         | **0.11**           | 20619   |
 |  gzip 1.9               | 2.74     | 4.69             | 0.63               | 48552   |
 
+The algorithm
+-------------
+
+The **x** uses an adaptive Golomb-Rice coding based on context modeling.
+
 How to build?
 -------------
 
