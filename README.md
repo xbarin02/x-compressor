@@ -8,8 +8,8 @@ Why?
 
 Because readable and maintainable code is key.
 The **x** is an easily verifiable and portable lossless data compressor.
-Source codes count less than 700 lines in total.
-A core library is less than 500 lines in pure C89.
+Source codes count less than 600 lines in total.
+A core library is 400 lines in pure C.
 
 Benchmarks
 ----------
@@ -29,7 +29,7 @@ Bold font indicates the best result.
 |  ----------             | -----    | ---------------- | ------------------ | ----    |
 |  lz4 1.9.2              | 1.75     | **0.29**         | **0.11**           | 20619   |
 |  lzop 1.04              | 1.78     | 0.36             | 0.33               | 17123   |
-|  **x**                  | 1.88     | 1.07             | 0.93               | **663** |
+|  **x**                  | 1.88     | 1.07             | 0.93               | **593** |
 |  gzip 1.9               | 2.74     | 4.69             | 0.63               | 48552   |
 |  bzip2 1.0.6            | **3.45** | 7.39             | 3.36               | 8117    |
 

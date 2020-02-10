@@ -3,10 +3,8 @@
 
 #include <stddef.h>
 
-typedef unsigned char uchar;
-
 void init();
-uchar *compress(uchar *iptr, size_t isize, uchar *optr);
-uchar *decompress(uchar *iptr, uchar *optr);
+void *compress(void *iptr, size_t isize, void *optr);
+void *decompress(void *iptr, void *optr);
 
 #endif /* LIBX_H_ */

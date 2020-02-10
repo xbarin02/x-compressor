@@ -25,7 +25,7 @@ void fsave(void *ptr, size_t size, FILE *stream)
 
 void fdump(void *ptr, void *end, FILE *stream)
 {
-	size_t size = (uchar *)end - (uchar *)ptr;
+	size_t size = (char *)end - (char *)ptr;
 
 	printf("Output size: %lu bytes\n", (unsigned long)size);
 
@@ -34,14 +34,12 @@ void fdump(void *ptr, void *end, FILE *stream)
 
 size_t fsize(FILE *stream)
 {
-	long size;
-
 	if (fseek(stream, 0, SEEK_END)) {
 		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
-	size = ftell(stream);
+	long size = ftell(stream);
 
 	if (size == (long)-1) {
 		abort();
@@ -82,7 +80,6 @@ int main(int argc, char *argv[])
 	int mode = (argc > 0 && strcmp(basename(argv[0]), "unx") == 0) ? DECOMPRESS : COMPRESS;
 	FILE *istream = NULL;
 	FILE *ostream = NULL;
-	size_t isize;
 	int force = 0;
 	void *iptr, *optr, *end;
 
@@ -152,19 +149,14 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-	isize = fsize(istream);
+	size_t isize = fsize(istream);
 
 	printf("Input size: %lu bytes\n", (unsigned long)isize);
 
 	iptr = malloc(isize);
 	optr = malloc(8 * isize);
 
-	if (iptr == NULL) {
-		fprintf(stderr, "Out of memory\n");
-		abort();
-	}
-
-	if (optr == NULL) {
+	if (iptr == NULL || optr == NULL) {
 		fprintf(stderr, "Out of memory\n");
 		abort();
 	}
