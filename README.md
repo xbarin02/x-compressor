@@ -66,7 +66,13 @@ Decompress:
 ./unx INPUT-FILE [OUTPUT-FILE]
 ```
 
-Author
-------
+Authors
+-------
 
-- [David Barina](mailto:ibarina@fit.vutbr.cz)
+- David Barina, <ibarina@fit.vutbr.cz>
+
+License
+-------
+
+This project is licensed under the MIT License.
+See the [LICENSE.md](LICENSE.md) file for details.
