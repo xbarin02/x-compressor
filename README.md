@@ -6,6 +6,7 @@ x &ndash; minimalist data compressor
 Why?
 ----
 
+Because readable and maintainable code is key.
 The **x** is an easily verifiable and portable lossless data compressor.
 Source codes count less than 700 lines in total.
 A core library is less than 500 lines in pure C89.
