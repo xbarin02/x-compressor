@@ -85,6 +85,8 @@ static void bio_reload_buffer(struct bio *bio)
 	bio->b = *(uint32 *)bio->ptr;
 
 	bio->ptr += 4;
+
+	bio->c = 0;
 }
 
 static void bio_put_nonzero_bit(struct bio *bio)
@@ -186,7 +188,6 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 	/* reload? */
 	if (bio->c == 32) {
 		bio_reload_buffer(bio);
-		bio->c = 0;
 	}
 
 	/* get the avail. least-significant bits */
@@ -204,7 +205,6 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 		assert(bio->c == 32);
 
 		bio_reload_buffer(bio);
-		bio->c = 0;
 
 		w |= (bio->b & (((uint32)1 << n) - 1)) << s;
 
@@ -250,7 +250,6 @@ static uint32 bio_read_unary(struct bio *bio)
 		/* reload? */
 		if (bio->c == 32) {
 			bio_reload_buffer(bio);
-			bio->c = 0;
 		}
 
 		/* get trailing zeros */
