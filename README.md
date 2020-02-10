@@ -47,7 +47,7 @@ make BUILD=release
 or
 
 ```
-make BUILD=build-pgo
+make build-pgo
 ```
 
 How to use?
