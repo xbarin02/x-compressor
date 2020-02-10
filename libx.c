@@ -44,14 +44,6 @@ static size_t N;
 
 #define RESET_INTERVAL 256
 
-static void bio_reset_after_flush(struct bio *bio)
-{
-	assert(bio != NULL);
-
-	bio->b = 0;
-	bio->c = 0;
-}
-
 static void bio_open(struct bio *bio, uchar *ptr, int mode)
 {
 	assert(bio != NULL);
@@ -65,7 +57,8 @@ static void bio_open(struct bio *bio, uchar *ptr, int mode)
 			bio->c = 32;
 			break;
 		case BIO_MODE_WRITE:
-			bio_reset_after_flush(bio);
+			bio->b = 0;
+			bio->c = 0;
 			break;
 	}
 }
@@ -79,6 +72,9 @@ static void bio_flush_buffer(struct bio *bio)
 	*((uint32 *)bio->ptr) = bio->b;
 
 	bio->ptr += 4;
+
+	bio->b = 0;
+	bio->c = 0;
 }
 
 static void bio_reload_buffer(struct bio *bio)
@@ -102,7 +98,6 @@ static void bio_put_nonzero_bit(struct bio *bio)
 
 	if (bio->c == 32) {
 		bio_flush_buffer(bio);
-		bio_reset_after_flush(bio);
 	}
 }
 
@@ -153,7 +148,6 @@ static void bio_write_bits(struct bio *bio, uint32 b, size_t n)
 
 		if (bio->c == 32) {
 			bio_flush_buffer(bio);
-			bio_reset_after_flush(bio);
 		}
 
 		b >>= m;
@@ -178,7 +172,6 @@ static void bio_write_zero_bits(struct bio *bio, size_t n)
 
 		if (bio->c == 32) {
 			bio_flush_buffer(bio);
-			bio_reset_after_flush(bio);
 		}
 
 		n -= m;
