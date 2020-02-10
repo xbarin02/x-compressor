@@ -264,9 +264,9 @@ void init()
 
 	for (int p = 0; p < 256; ++p) {
 		for (int i = 0; i < 256; ++i) {
-			table[p].sorted[i] = (unsigned char)i;
+			table[p].sorted[i] = i;
 			table[p].freq[i] = 0;
-			table[p].order[table[p].sorted[i]] = (unsigned char)i;
+			table[p].order[i] = i;
 		}
 	}
 }
