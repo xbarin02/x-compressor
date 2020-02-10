@@ -134,38 +134,6 @@ static size_t ctzu32(uint32 n)
 	}
 }
 
-static uint32 bio_get_zeros_and_drop_bit(struct bio *bio)
-{
-	uint32 total_zeros = 0;
-
-	assert(bio != NULL);
-
-	do {
-		size_t s;
-
-		/* reload? */
-		if (bio->c == 32) {
-			bio_reload_buffer(bio);
-			bio->c = 0;
-		}
-
-		/* get trailing zeros */
-		s = minsize(32 - bio->c, ctzu32(bio->b));
-
-		bio->b >>= s;
-		bio->c += s;
-
-		total_zeros += s;
-	} while (bio->c == 32);
-
-	assert(bio->c < 32);
-
-	bio->b >>= 1;
-	bio->c++;
-
-	return total_zeros;
-}
-
 static void bio_write_bits(struct bio *bio, uint32 b, size_t n)
 {
 	assert(n <= 32);
@@ -278,7 +246,36 @@ static void bio_write_unary(struct bio *bio, uint32 N)
 
 static uint32 bio_read_unary(struct bio *bio)
 {
-	return bio_get_zeros_and_drop_bit(bio);
+	/* get zeros... */
+	uint32 total_zeros = 0;
+
+	assert(bio != NULL);
+
+	do {
+		size_t s;
+
+		/* reload? */
+		if (bio->c == 32) {
+			bio_reload_buffer(bio);
+			bio->c = 0;
+		}
+
+		/* get trailing zeros */
+		s = minsize(32 - bio->c, ctzu32(bio->b));
+
+		bio->b >>= s;
+		bio->c += s;
+
+		total_zeros += s;
+	} while (bio->c == 32);
+
+	/* ...and drop non-zero bit */
+	assert(bio->c < 32);
+
+	bio->b >>= 1;
+	bio->c++;
+
+	return total_zeros;
 }
 
 /* Golomb-Rice, encode non-negative integer N, parameter M = 2^k */
