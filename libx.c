@@ -146,7 +146,6 @@ static uint32 bio_get_zeros_and_drop_bit(struct bio *bio)
 		/* reload? */
 		if (bio->c == 32) {
 			bio_reload_buffer(bio);
-
 			bio->c = 0;
 		}
 
@@ -162,7 +161,6 @@ static uint32 bio_get_zeros_and_drop_bit(struct bio *bio)
 	assert(bio->c < 32);
 
 	bio->b >>= 1;
-
 	bio->c++;
 
 	return total_zeros;
@@ -227,7 +225,6 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 	/* reload? */
 	if (bio->c == 32) {
 		bio_reload_buffer(bio);
-
 		bio->c = 0;
 	}
 
@@ -246,7 +243,6 @@ static uint32 bio_read_bits(struct bio *bio, size_t n)
 		assert(bio->c == 32);
 
 		bio_reload_buffer(bio);
-
 		bio->c = 0;
 
 		w |= (bio->b & (((uint32)1 << n) - 1)) << s;
