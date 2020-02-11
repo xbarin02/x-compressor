@@ -109,6 +109,17 @@ int main(int argc, char *argv[])
 			break;
 		case 1:
 			istream = fopen(argv[optind], "r");
+			/* guess output file name */
+			if (mode == COMPRESS) {
+				char path[4096];
+				sprintf(path, "%s.x", argv[optind]); /* add .x suffix */
+				ostream = force_fopen(path, "w", force);
+			} else {
+				if (strrchr(argv[optind], '.') != NULL) {
+					*strrchr(argv[optind], '.') = 0; /* remove suffix */
+				}
+				ostream = force_fopen(argv[optind], "w", force);
+			}
 			break;
 		case 2:
 			istream = fopen(argv[optind+0], "r");
@@ -120,19 +131,6 @@ int main(int argc, char *argv[])
 	}
 
 	fprintf(stderr, "%s\n", mode == COMPRESS ? "Compressing..." : "Decompressing...");
-
-	if (ostream == NULL) {
-		if (mode == COMPRESS) {
-			char path[4096];
-			sprintf(path, "%s.x", argv[optind]); /* add .x suffix */
-			ostream = force_fopen(path, "w", force);
-		} else {
-			if (strrchr(argv[optind], '.') != NULL) {
-				*strrchr(argv[optind], '.') = 0; /* remove suffix */
-			}
-			ostream = force_fopen(argv[optind], "w", force);
-		}
-	}
 
 	if (istream == NULL) {
 		fprintf(stderr, "Cannot open input file\n");
