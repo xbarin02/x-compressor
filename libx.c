@@ -9,7 +9,6 @@ enum {
 };
 
 struct bio {
-	int mode;           /* reading or writing? */
 	unsigned char *ptr; /* pointer to memory */
 	uint32_t b;         /* bit buffer */
 	size_t c;           /* bit counter */
@@ -31,7 +30,6 @@ static void bio_open(struct bio *bio, unsigned char *ptr, int mode)
 	assert(bio != NULL);
 	assert(ptr != NULL);
 
-	bio->mode = mode;
 	bio->ptr = ptr;
 
 	switch (mode) {
@@ -179,11 +177,11 @@ static uint32_t bio_read_bits(struct bio *bio, size_t n)
 	return w;
 }
 
-static void bio_close(struct bio *bio)
+static void bio_close(struct bio *bio, int mode)
 {
 	assert(bio != NULL);
 
-	if (bio->mode == BIO_MODE_WRITE && bio->c > 0) {
+	if (mode == BIO_MODE_WRITE && bio->c > 0) {
 		bio_flush_buffer(bio);
 	}
 }
@@ -360,7 +358,7 @@ void *compress(void *iptr, size_t isize, void *optr)
 	/* EOF symbol */
 	bio_write_gr(&bio, opt_k, 256);
 
-	bio_close(&bio);
+	bio_close(&bio, BIO_MODE_WRITE);
 
 	return bio.ptr;
 }
@@ -394,7 +392,7 @@ void *decompress(void *iptr, void *optr)
 		context = table + c;
 	}
 
-	bio_close(&bio);
+	bio_close(&bio, BIO_MODE_READ);
 
 	return optrc;
 }
