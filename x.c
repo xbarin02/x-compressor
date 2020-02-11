@@ -122,17 +122,15 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%s\n", mode == COMPRESS ? "Compressing..." : "Decompressing...");
 
 	if (ostream == NULL) {
-		char path[4096];
-		switch (mode) {
-			case COMPRESS:
-				sprintf(path, "%s.x", argv[optind]);
-				ostream = force_fopen(path, "w", force);
-				break;
-			case DECOMPRESS:
-				if (strrchr(argv[optind], '.') != NULL) {
-					*strrchr(argv[optind], '.') = 0; /* remove suffix */
-				}
-				ostream = force_fopen(argv[optind], "w", force);
+		if (mode == COMPRESS) {
+			char path[4096];
+			sprintf(path, "%s.x", argv[optind]); /* add .x suffix */
+			ostream = force_fopen(path, "w", force);
+		} else {
+			if (strrchr(argv[optind], '.') != NULL) {
+				*strrchr(argv[optind], '.') = 0; /* remove suffix */
+			}
+			ostream = force_fopen(argv[optind], "w", force);
 		}
 	}
 
