@@ -126,14 +126,14 @@ int main(int argc, char *argv[])
 		switch (mode) {
 			case COMPRESS:
 				sprintf(path, "%s.x", argv[optind]);
+				ostream = force_fopen(path, "w", force);
 				break;
 			case DECOMPRESS:
-				sprintf(path, "%s.out", argv[optind]);
-				if (strlen(path) > 5 && strcmp(path + strlen(path) - 6, ".x.out") == 0) {
-					path[strlen(path) - 6] = 0;
+				if (strrchr(argv[optind], '.') != NULL) {
+					*strrchr(argv[optind], '.') = 0; /* remove suffix */
 				}
+				ostream = force_fopen(argv[optind], "w", force);
 		}
-		ostream = force_fopen(path, "w", force);
 	}
 
 	if (istream == NULL) {
