@@ -125,8 +125,7 @@ int main(int argc, char *argv[])
 		char path[4096];
 		switch (mode) {
 			case COMPRESS:
-				strcpy(path, argv[optind]);
-				strcat(path, ".x");
+				sprintf(path, "%s.x", argv[optind]);
 				break;
 			case DECOMPRESS:
 				strcpy(path, argv[optind]);
