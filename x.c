@@ -128,11 +128,9 @@ int main(int argc, char *argv[])
 				sprintf(path, "%s.x", argv[optind]);
 				break;
 			case DECOMPRESS:
-				strcpy(path, argv[optind]);
-				if (strlen(path) > 1 && strcmp(path + strlen(path) - 2, ".x") == 0) {
-					path[strlen(path) - 2] = 0;
-				} else {
-					strcat(path, ".out");
+				sprintf(path, "%s.out", argv[optind]);
+				if (strlen(path) > 5 && strcmp(path + strlen(path) - 6, ".x.out") == 0) {
+					path[strlen(path) - 6] = 0;
 				}
 		}
 		ostream = force_fopen(path, "w", force);
