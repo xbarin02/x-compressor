@@ -23,31 +23,31 @@ void fsave(void *ptr, size_t size, FILE *stream)
 	}
 }
 
-void fdump(void *ptr, void *end, FILE *stream)
-{
-	size_t size = (char *)end - (char *)ptr;
-
-	printf("Output size: %lu bytes\n", (unsigned long)size);
-
-	fsave(ptr, size, stream);
-}
-
 size_t fsize(FILE *stream)
 {
+	long begin = ftell(stream);
+
+	if (begin == (long)-1) {
+		abort();
+	}
+
 	if (fseek(stream, 0, SEEK_END)) {
 		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
-	long size = ftell(stream);
+	long end = ftell(stream);
 
-	if (size == (long)-1) {
+	if (end == (long)-1) {
 		abort();
 	}
 
-	rewind(stream);
+	if (fseek(stream, begin, SEEK_SET)) {
+		fprintf(stderr, "Stream is not seekable\n");
+		abort();
+	}
 
-	return (size_t)size;
+	return (size_t)end - (size_t)begin;
 }
 
 FILE *force_fopen(const char *pathname, const char *mode, int force)
@@ -71,8 +71,126 @@ void print_help(char *path)
 	fprintf(stderr, "Arguments :\n");
 	fprintf(stderr, " -d     : force decompression\n");
 	fprintf(stderr, " -z     : force compression\n");
-	fprintf(stderr, " -f     : overwrite existing output files\n");
+	fprintf(stderr, " -f     : overwrite existing output file\n");
 	fprintf(stderr, " -h     : print this message\n");
+}
+
+static size_t min_layers = 3;
+static size_t max_layers = 255;
+
+struct layer {
+	void *data; /* input data */
+	size_t size; /* input size */
+} layer[256];
+
+void free_layers()
+{
+	for (size_t j = 0; j < 256; ++j) {
+		if (layer[j].data != (void *)0) {
+			free(layer[j].data);
+		} else {
+			break;
+		}
+	}
+}
+
+size_t multi_compress(size_t j)
+{
+	assert(j + 1 < 256);
+
+	layer[j + 1].data = malloc(8 * layer[j].size);
+
+	if (layer[j + 1].data == NULL) {
+		abort();
+	}
+
+	init();
+
+	void *end = compress(layer[j].data, layer[j].size, layer[j + 1].data);
+
+	layer[j + 1].size = (char *)end - (char *)layer[j + 1].data;
+
+	if (j + 2 < 256 && j + 1 < max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
+		/* try next layer */
+		size_t J = multi_compress(j + 1);
+
+		if (layer[j].size < layer[J].size) {
+			return j;
+		} else {
+			return J;
+		}
+	}
+
+	return j;
+}
+
+void multi_decompress(size_t j)
+{
+	if (j == 0) {
+		return;
+	}
+
+	assert(j > 0 && j < 256);
+
+	layer[j - 1].data = malloc(8 * layer[j].size);
+
+	if (layer[j - 1].data == NULL) {
+		abort();
+	}
+
+	init();
+
+	void *end = decompress(layer[j].data, layer[j - 1].data);
+
+	layer[j - 1].size = (char *)end - (char *)layer[j - 1].data;
+
+	multi_decompress(j - 1);
+}
+
+void load_layer(size_t j, FILE *stream)
+{
+	layer[j].size = fsize(stream);
+	layer[j].data = malloc(layer[j].size);
+
+	if (layer[j].data == NULL) {
+		fprintf(stderr, "Out of memory\n");
+		abort();
+	}
+
+	fload(layer[j].data, layer[j].size, stream);
+}
+
+size_t load_from_container(FILE *stream)
+{
+	int c = fgetc(stream);
+
+	if (c == EOF) {
+		abort();
+	}
+
+	assert(c < 256);
+
+	size_t J = c;
+
+	load_layer(J, stream);
+
+	return J;
+}
+
+void save_layer(size_t j, FILE *stream)
+{
+	printf("Output size: %lu bytes\n", (unsigned long)layer[j].size);
+
+	fsave(layer[j].data, layer[j].size, stream);
+}
+
+void save_to_container(size_t J, FILE *stream)
+{
+	if (fputc(J, stream) == EOF) {
+		abort();
+	}
+
+	save_layer(J, stream);
 }
 
 int main(int argc, char *argv[])
@@ -81,7 +199,6 @@ int main(int argc, char *argv[])
 	FILE *istream = NULL;
 	FILE *ostream = NULL;
 	int force = 0;
-	void *iptr, *optr, *end;
 
 	parse: switch (getopt(argc, argv, "zdfh")) {
 		case 'z':
@@ -142,35 +259,32 @@ int main(int argc, char *argv[])
 		abort();
 	}
 
-	size_t isize = fsize(istream);
-
-	printf("Input size: %lu bytes\n", (unsigned long)isize);
-
-	iptr = malloc(isize);
-	optr = malloc(8 * isize);
-
-	if (iptr == NULL || optr == NULL) {
-		fprintf(stderr, "Out of memory\n");
-		abort();
-	}
-
-	init();
-
-	fload(iptr, isize, istream);
-
 	if (mode == COMPRESS) {
-		end = compress(iptr, isize, optr);
+		load_layer(0, istream);
+
+		printf("Input size: %lu bytes\n", (unsigned long)layer[0].size);
+
+		size_t J = multi_compress(0);
+
+		printf("Number of layers: %lu\n", J);
+
+		save_to_container(J, ostream);
 	} else {
-		end = decompress(iptr, optr);
+		size_t J = load_from_container(istream);
+
+		printf("Input size: %lu bytes\n", (unsigned long)layer[J].size);
+
+		printf("Number of layers: %lu\n", J);
+
+		multi_decompress(J);
+
+		save_layer(0, ostream);
 	}
 
-	fdump(optr, end, ostream);
+	free_layers();
 
 	fclose(istream);
 	fclose(ostream);
-
-	free(iptr);
-	free(optr);
 
 	return 0;
 }
