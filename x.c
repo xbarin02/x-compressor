@@ -97,35 +97,31 @@ void free_layers()
 
 size_t multi_compress(size_t j)
 {
-	assert(j + 1 < 256);
+	size_t J = j + 1;
 
-	layer[j + 1].data = malloc(8 * layer[j].size);
+	assert(J < 256);
 
-	if (layer[j + 1].data == NULL) {
+	layer[J].data = malloc(8 * layer[j].size);
+
+	if (layer[J].data == NULL) {
 		abort();
 	}
 
 	init();
 
-	void *end = compress(layer[j].data, layer[j].size, layer[j + 1].data);
+	void *end = compress(layer[j].data, layer[j].size, layer[J].data);
 
-	layer[j + 1].size = (char *)end - (char *)layer[j + 1].data;
+	layer[J].size = (char *)end - (char *)layer[J].data;
 
-	if (j + 2 < 256 && j + 2 <= max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
+	if (J + 1 < 256 && J + 1 <= max_layers && (layer[J].size < layer[j].size || J < min_layers)) {
 		/* try next layer */
-		size_t J = multi_compress(j + 1);
-
-		if (layer[j].size < layer[J].size) {
-			return j;
-		} else {
-			return J;
-		}
+		J = multi_compress(J);
 	}
 
-	if (layer[j].size < layer[j + 1].size) {
+	if (layer[j].size < layer[J].size) {
 		return j;
 	} else {
-		return j + 1;
+		return J;
 	}
 }
 
