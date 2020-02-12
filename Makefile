@@ -48,7 +48,7 @@ distclean: clean
 .PHONY: build-pgo
 build-pgo:
 	$(MAKE) distclean all BUILD=profile-generate
-	./x -f libx.c
+	./x -f -1 libx.c
 	./unx -f libx.c.x libx.c.x.out
 	diff libx.c libx.c.x.out
 	$(MAKE) clean all BUILD=profile-use
