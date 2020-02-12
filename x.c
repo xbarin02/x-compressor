@@ -111,7 +111,7 @@ size_t multi_compress(size_t j)
 
 	layer[j + 1].size = (char *)end - (char *)layer[j + 1].data;
 
-	if (j + 2 < 256 && j + 1 <= max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
+	if (j + 2 < 256 && j + 2 <= max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
 		/* try next layer */
 		size_t J = multi_compress(j + 1);
 
@@ -122,7 +122,11 @@ size_t multi_compress(size_t j)
 		}
 	}
 
-	return j;
+	if (layer[j].size < layer[j + 1].size) {
+		return j;
+	} else {
+		return j + 1;
+	}
 }
 
 void multi_decompress(size_t j)
