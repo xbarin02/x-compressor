@@ -110,7 +110,7 @@ size_t multi_compress(size_t j)
 
 	layer[j + 1].size = (char *)end - (char *)layer[j + 1].data;
 
-	if (j + 2 < 256 && j + 1 < max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
+	if (j + 2 < 256 && j + 1 <= max_layers && (layer[j + 1].size < layer[j].size || j + 1 < min_layers)) {
 		/* try next layer */
 		size_t J = multi_compress(j + 1);
 
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 	FILE *ostream = NULL;
 	int force = 0;
 
-	parse: switch (getopt(argc, argv, "zdfh")) {
+	parse: switch (getopt(argc, argv, "zdf1h")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
@@ -209,6 +209,9 @@ int main(int argc, char *argv[])
 			goto parse;
 		case 'f':
 			force = 1;
+			goto parse;
+		case '1':
+			max_layers = 1;
 			goto parse;
 		case 'h':
 			print_help(argv[0]);
