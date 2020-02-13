@@ -73,6 +73,7 @@ void print_help(char *path)
 	fprintf(stderr, " -d     : force decompression\n");
 	fprintf(stderr, " -z     : force compression\n");
 	fprintf(stderr, " -f     : overwrite existing output file\n");
+	fprintf(stderr, " -k     : keep (don't delete) input file (default)\n");
 	fprintf(stderr, " -h     : print this message\n");
 }
 
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
 	FILE *ostream = NULL;
 	int force = 0;
 
-	parse: switch (getopt(argc, argv, "zdf1h")) {
+	parse: switch (getopt(argc, argv, "zdf1kh")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
@@ -205,6 +206,8 @@ int main(int argc, char *argv[])
 			goto parse;
 		case '1':
 			max_layers = 1;
+			goto parse;
+		case 'k':
 			goto parse;
 		case 'h':
 			print_help(argv[0]);
