@@ -18,7 +18,7 @@ static struct context {
 	size_t freq[256];          /* char -> frequency */
 	unsigned char sorted[256]; /* index -> char */
 	unsigned char order[256];  /* char -> index */
-} table[256];
+} table[65536];
 
 static size_t opt_k;
 static size_t sum_delta, N; /* mean = sum_delta / N */
@@ -261,7 +261,7 @@ void init()
 	sum_delta = 0;
 	N = 0;
 
-	for (int p = 0; p < 256; ++p) {
+	for (int p = 0; p < 65536; ++p) {
 		for (int i = 0; i < 256; ++i) {
 			table[p].sorted[i] = i;
 			table[p].freq[i] = 0;
@@ -333,7 +333,8 @@ void *compress(void *iptr, size_t isize, void *optr)
 {
 	struct bio bio;
 	unsigned char *end = (unsigned char *)iptr + isize;
-	struct context *context = table + 0;
+	uint16_t C = 0;
+	struct context *context = table + C;
 
 	bio_open(&bio, optr, BIO_MODE_WRITE);
 
@@ -353,7 +354,9 @@ void *compress(void *iptr, size_t isize, void *optr)
 		/* update Golomb-Rice model */
 		update_model(d);
 
-		context = table + c;
+		C = (C << 8) | c;
+
+		context = table + C;
 	}
 
 	/* EOF symbol */
@@ -367,7 +370,8 @@ void *compress(void *iptr, size_t isize, void *optr)
 void *decompress(void *iptr, void *optr)
 {
 	struct bio bio;
-	struct context *context = table + 0;
+	uint16_t C = 0;
+	struct context *context = table + C;
 
 	bio_open(&bio, iptr, BIO_MODE_READ);
 
@@ -390,7 +394,9 @@ void *decompress(void *iptr, void *optr)
 
 		update_model(d);
 
-		context = table + c;
+		C = (C << 8) | c;
+
+		context = table + C;
 	}
 
 	bio_close(&bio, BIO_MODE_READ);
