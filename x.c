@@ -118,11 +118,7 @@ size_t multi_compress(size_t j)
 		J = multi_compress(J);
 	}
 
-	if (layer[j].size < layer[J].size) {
-		return j;
-	} else {
-		return J;
-	}
+	return layer[j].size < layer[J].size ? j : J;
 }
 
 void multi_decompress(size_t j)
@@ -243,8 +239,8 @@ int main(int argc, char *argv[])
 			}
 			break;
 		case 2:
-			istream = fopen(argv[optind+0], "r");
-			ostream = force_fopen(argv[optind+1], "w", force);
+			istream = fopen(argv[optind + 0], "r");
+			ostream = force_fopen(argv[optind + 1], "w", force);
 			break;
 		default:
 			fprintf(stderr, "Unexpected argument\n");
