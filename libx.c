@@ -10,8 +10,8 @@ enum {
 
 struct bio {
 	uint32_t *ptr; /* pointer to memory */
-	uint32_t b;         /* bit buffer */
-	size_t c;           /* bit counter */
+	uint32_t b;    /* bit buffer */
+	size_t c;      /* bit counter */
 };
 
 static struct context {
@@ -107,8 +107,7 @@ static void bio_write_bits(struct bio *bio, uint32_t b, size_t n)
 {
 	assert(n <= 32);
 
-	for (int i = 0; i < 2; ++i)
-	{
+	for (int i = 0; i < 2; ++i) {
 		assert(bio->c < 32);
 
 		size_t m = minsize(32 - bio->c, n);
@@ -150,7 +149,6 @@ static void bio_write_zero_bits(struct bio *bio, size_t n)
 
 static uint32_t bio_read_bits(struct bio *bio, size_t n)
 {
-	/* reload? */
 	if (bio->c == 32) {
 		bio_reload_buffer(bio);
 	}
