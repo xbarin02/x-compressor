@@ -107,12 +107,13 @@ static void bio_write_bits(struct bio *bio, uint32_t b, size_t n)
 {
 	assert(n <= 32);
 
-	while (n > 0) {
+	for (int i = 0; i < 2; ++i)
+	{
 		assert(bio->c < 32);
 
 		size_t m = minsize(32 - bio->c, n);
 
-		bio->b |= (uint32_t)((b & (((uint32_t)1 << m) - 1)) << bio->c);
+		bio->b |= (b & (((uint32_t)1 << m) - 1)) << bio->c;
 		bio->c += m;
 
 		if (bio->c == 32) {
@@ -121,6 +122,10 @@ static void bio_write_bits(struct bio *bio, uint32_t b, size_t n)
 
 		b >>= m;
 		n -= m;
+
+		if (n == 0) {
+			return;
+		}
 	}
 }
 
