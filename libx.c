@@ -9,7 +9,7 @@ enum {
 };
 
 struct bio {
-	unsigned char *ptr; /* pointer to memory */
+	uint32_t *ptr; /* pointer to memory */
 	uint32_t b;         /* bit buffer */
 	size_t c;           /* bit counter */
 };
@@ -25,7 +25,7 @@ static size_t sum_delta, N; /* mean = sum_delta / N */
 
 #define RESET_INTERVAL 256 /* recompute Golomb-Rice codes after... */
 
-static void bio_open(struct bio *bio, unsigned char *ptr, int mode)
+static void bio_open(struct bio *bio, void *ptr, int mode)
 {
 	assert(bio != NULL);
 	assert(ptr != NULL);
@@ -48,10 +48,9 @@ static void bio_flush_buffer(struct bio *bio)
 	assert(bio != NULL);
 	assert(bio->ptr != NULL);
 
-	*((uint32_t *)bio->ptr) = bio->b;
+	*(bio->ptr++) = bio->b;
 	bio->b = 0;
 	bio->c = 0;
-	bio->ptr += 4;
 }
 
 static void bio_reload_buffer(struct bio *bio)
@@ -59,9 +58,8 @@ static void bio_reload_buffer(struct bio *bio)
 	assert(bio != NULL);
 	assert(bio->ptr != NULL);
 
-	bio->b = *(uint32_t *)bio->ptr;
+	bio->b = *(bio->ptr++);
 	bio->c = 0;
-	bio->ptr += 4;
 }
 
 static void bio_put_nonzero_bit(struct bio *bio)
