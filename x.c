@@ -87,11 +87,7 @@ struct layer {
 void free_layers()
 {
 	for (size_t j = 0; j < 256; ++j) {
-		if (layer[j].data != (void *)0) {
-			free(layer[j].data);
-		} else {
-			break;
-		}
+		free(layer[j].data);
 	}
 }
 
