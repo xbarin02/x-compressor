@@ -68,7 +68,7 @@ void print_help(char *path)
 {
 	fprintf(stderr, "Usage :\n\t%s [arguments] [input-file] [output-file]\n\n", path);
 	fprintf(stderr, "Arguments :\n");
-	fprintf(stderr, " -1     : compress faster\n");
+	fprintf(stderr, " -1     : compress faster (default)\n");
 	fprintf(stderr, " -9     : compress better\n");
 	fprintf(stderr, " -d     : force decompression\n");
 	fprintf(stderr, " -z     : force compression\n");
