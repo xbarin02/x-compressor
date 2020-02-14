@@ -1,6 +1,7 @@
 CFLAGS+=-std=c99 -pedantic -Wall -Wextra
 LDFLAGS+=
 LDLIBS+=
+
 BINDIR?=$(DESTDIR)$(PREFIX)/bin
 
 BIN=x unx
