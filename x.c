@@ -69,6 +69,7 @@ void print_help(char *path)
 	fprintf(stderr, "Usage :\n\t%s [arguments] [input-file] [output-file]\n\n", path);
 	fprintf(stderr, "Arguments :\n");
 	fprintf(stderr, " -1     : compress faster\n");
+	fprintf(stderr, " -9     : compress better\n");
 	fprintf(stderr, " -d     : force decompression\n");
 	fprintf(stderr, " -z     : force compression\n");
 	fprintf(stderr, " -f     : overwrite existing output file\n");
@@ -195,7 +196,7 @@ int main(int argc, char *argv[])
 	FILE *ostream = NULL;
 	int force = 0;
 
-	parse: switch (getopt(argc, argv, "zdf1kh")) {
+	parse: switch (getopt(argc, argv, "zdf19kh")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
@@ -207,6 +208,9 @@ int main(int argc, char *argv[])
 			goto parse;
 		case '1':
 			max_layers = 1;
+			goto parse;
+		case '9':
+			max_layers = 255;
 			goto parse;
 		case 'k':
 			goto parse;
