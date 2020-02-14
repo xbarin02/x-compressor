@@ -78,7 +78,7 @@ void print_help(char *path)
 }
 
 static size_t min_layers = 3;
-static size_t max_layers = 255;
+static size_t max_layers = 1;
 
 struct layer {
 	void *data; /* input data */
