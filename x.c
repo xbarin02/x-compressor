@@ -28,6 +28,7 @@ size_t fsize(FILE *stream)
 	long begin = ftell(stream);
 
 	if (begin == (long)-1) {
+		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
