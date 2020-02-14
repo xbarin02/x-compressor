@@ -33,7 +33,6 @@ size_t fsize(FILE *stream)
 	}
 
 	if (fseek(stream, 0, SEEK_END)) {
-		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
@@ -44,7 +43,6 @@ size_t fsize(FILE *stream)
 	}
 
 	if (fseek(stream, begin, SEEK_SET)) {
-		fprintf(stderr, "Stream is not seekable\n");
 		abort();
 	}
 
@@ -154,7 +152,7 @@ void load_layer(size_t j, FILE *stream)
 
 	fload(layer[j].data, layer[j].size, stream);
 
-	printf("Input size: %lu bytes\n", (unsigned long)layer[j].size);
+	fprintf(stderr, "Input size: %lu bytes\n", (unsigned long)layer[j].size);
 }
 
 size_t load_from_container(FILE *stream)
@@ -176,7 +174,7 @@ size_t load_from_container(FILE *stream)
 
 void save_layer(size_t j, FILE *stream)
 {
-	printf("Output size: %lu bytes\n", (unsigned long)layer[j].size);
+	fprintf(stderr, "Output size: %lu bytes\n", (unsigned long)layer[j].size);
 
 	fsave(layer[j].data, layer[j].size, stream);
 }
@@ -266,13 +264,13 @@ int main(int argc, char *argv[])
 
 		size_t J = multi_compress(0);
 
-		printf("Number of layers: %lu\n", J);
+		fprintf(stderr, "Number of layers: %lu\n", J);
 
 		save_to_container(J, ostream);
 	} else {
 		size_t J = load_from_container(istream);
 
-		printf("Number of layers: %lu\n", J);
+		fprintf(stderr, "Number of layers: %lu\n", J);
 
 		multi_decompress(J);
 
