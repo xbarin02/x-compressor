@@ -1,6 +1,7 @@
 CFLAGS+=-std=c99 -pedantic -Wall -Wextra
 LDFLAGS+=
 LDLIBS+=
+BINDIR?=$(DESTDIR)$(PREFIX)/bin
 
 BIN=x unx
 
@@ -60,8 +61,6 @@ check: all
 	./unx -f libx.c.x libx.c.x.out
 	diff libx.c libx.c.x.out
 	-$(RM) -- libx.c.x libx.c.x.out
-
-BINDIR ?= $(DESTDIR)$(PREFIX)/bin
 
 .PHONY: install
 install: all
