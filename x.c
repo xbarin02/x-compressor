@@ -152,6 +152,8 @@ void load_layer(size_t j, FILE *stream)
 	}
 
 	fload(layer[j].data, layer[j].size, stream);
+
+	printf("Input size: %lu bytes\n", (unsigned long)layer[j].size);
 }
 
 size_t load_from_container(FILE *stream)
@@ -261,8 +263,6 @@ int main(int argc, char *argv[])
 	if (mode == COMPRESS) {
 		load_layer(0, istream);
 
-		printf("Input size: %lu bytes\n", (unsigned long)layer[0].size);
-
 		size_t J = multi_compress(0);
 
 		printf("Number of layers: %lu\n", J);
@@ -270,8 +270,6 @@ int main(int argc, char *argv[])
 		save_to_container(J, ostream);
 	} else {
 		size_t J = load_from_container(istream);
-
-		printf("Input size: %lu bytes\n", (unsigned long)layer[J].size);
 
 		printf("Number of layers: %lu\n", J);
 
