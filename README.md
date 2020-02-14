@@ -41,7 +41,8 @@ The algorithm
 -------------
 
 The **x** uses an adaptive Golomb-Rice coding based on context modeling.
-The compressor can switch between fast compression mode (`-1` argument) and high compression mode (default).
+The context model uses a single previous byte in the uncompressed stream to predict the next byte.
+The compressor can switch between fast compression mode (`-1` argument) and multi-pass high compression mode (default).
 
 How to build?
 -------------
