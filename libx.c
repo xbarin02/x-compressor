@@ -39,7 +39,6 @@ static void bio_open(struct bio *bio, void *ptr, int mode)
 		case BIO_MODE_WRITE:
 			bio->b = 0;
 			bio->c = 0;
-			break;
 	}
 }
 
