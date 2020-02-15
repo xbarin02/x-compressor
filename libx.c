@@ -132,18 +132,16 @@ static void bio_write_zero_bits(struct bio *bio, size_t n)
 {
 	assert(n <= 32);
 
-	while (n > 0) {
+	for (size_t m; n > 0; n -= m) {
 		assert(bio->c < 32);
 
-		size_t m = minsize(32 - bio->c, n);
+		m = minsize(32 - bio->c, n);
 
 		bio->c += m;
 
 		if (bio->c == 32) {
 			bio_flush_buffer(bio);
 		}
-
-		n -= m;
 	}
 }
 
