@@ -33,13 +33,11 @@ static void bio_open(struct bio *bio, void *ptr, void *end, int mode)
 	bio->ptr = ptr;
 	bio->end = (char *)end - 3;
 
-	switch (mode) {
-		case BIO_MODE_READ:
-			bio->c = 32;
-			break;
-		case BIO_MODE_WRITE:
-			bio->b = 0;
-			bio->c = 0;
+	if (mode == BIO_MODE_READ) {
+		bio->c = 32;
+	} else {
+		bio->b = 0;
+		bio->c = 0;
 	}
 }
 
@@ -209,7 +207,6 @@ static uint32_t bio_read_unary(struct bio *bio)
 	assert(bio != NULL);
 
 	do {
-		/* reload? */
 		if (bio->c == 32) {
 			bio_reload_buffer(bio);
 		}

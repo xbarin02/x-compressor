@@ -168,8 +168,6 @@ size_t load_from_container(FILE *stream)
 		abort();
 	}
 
-	assert(c < 256);
-
 	size_t J = c;
 
 	load_layer(J, stream);
@@ -196,8 +194,7 @@ void save_to_container(size_t J, FILE *stream)
 int main(int argc, char *argv[])
 {
 	int mode = (argc > 0 && strcmp(basename(argv[0]), "unx") == 0) ? DECOMPRESS : COMPRESS;
-	FILE *istream = NULL;
-	FILE *ostream = NULL;
+	FILE *istream = NULL, *ostream = NULL;
 	int force = 0;
 
 	parse: switch (getopt(argc, argv, "zdf019kh")) {
