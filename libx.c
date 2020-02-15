@@ -29,7 +29,6 @@ static size_t sum_delta, N; /* mean = sum_delta / N */
 static void bio_open(struct bio *bio, void *ptr, void *end, int mode)
 {
 	assert(bio != NULL);
-	assert(ptr != NULL);
 
 	bio->ptr = ptr;
 	bio->end = (char *)end - 3;
