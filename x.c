@@ -161,6 +161,7 @@ size_t load_from_container(FILE *stream)
 	int c = fgetc(stream);
 
 	if (c == EOF) {
+		fprintf(stderr, "Unexpected end of file\n");
 		abort();
 	}
 

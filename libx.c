@@ -376,11 +376,9 @@ void *decompress(void *iptr, void *optr)
 	for (;; ++optrc) {
 		uint32_t d = bio_read_gr(&bio, opt_k);
 
-		if (d == 256) {
+		if (d >= 256) {
 			break;
 		}
-
-		assert(d < 256);
 
 		unsigned char c = context->sorted[d];
 
