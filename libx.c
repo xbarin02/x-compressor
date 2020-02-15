@@ -22,7 +22,7 @@ static struct context {
 } table[256];
 
 static size_t opt_k;
-static size_t sum_delta, N; /* mean = sum_delta / N */
+static size_t symbol_sum, symbol_count; /* mean = symbol_sum / symbol_count */
 
 #define RESET_INTERVAL 256 /* recompute Golomb-Rice codes after... */
 
@@ -259,8 +259,8 @@ static uint32_t bio_read_gr(struct bio *bio, size_t k)
 void init()
 {
 	opt_k = 3;
-	sum_delta = 0;
-	N = 0;
+	symbol_sum = 0;
+	symbol_count = 0;
 
 	for (int p = 0; p < 256; ++p) {
 		for (int i = 0; i < 256; ++i) {
@@ -313,21 +313,21 @@ static void increment_frequency(struct context *context, unsigned char c)
 /* https://ipnpr.jpl.nasa.gov/progress_report/42-159/159E.pdf */
 static void update_model(unsigned char delta)
 {
-	if (N == RESET_INTERVAL) {
+	if (symbol_count == RESET_INTERVAL) {
 		int k;
 
 		/* 2^k <= E{r[k]} + 0 */
-		for (k = 1; (N << k) <= sum_delta; ++k)
+		for (k = 1; (symbol_count << k) <= symbol_sum; ++k)
 			;
 
 		opt_k = k - 1;
 
-		N = 0;
-		sum_delta = 0;
+		symbol_count = 0;
+		symbol_sum = 0;
 	}
 
-	sum_delta += delta;
-	N++;
+	symbol_sum += delta;
+	symbol_count++;
 }
 
 void *compress(void *iptr, size_t isize, void *optr)
