@@ -10,6 +10,7 @@ enum {
 
 struct bio {
 	uint32_t *ptr; /* pointer to memory */
+	void *end;
 	uint32_t b;    /* bit buffer */
 	size_t c;      /* bit counter */
 };
@@ -25,12 +26,13 @@ static size_t sum_delta, N; /* mean = sum_delta / N */
 
 #define RESET_INTERVAL 256 /* recompute Golomb-Rice codes after... */
 
-static void bio_open(struct bio *bio, void *ptr, int mode)
+static void bio_open(struct bio *bio, void *ptr, void *end, int mode)
 {
 	assert(bio != NULL);
 	assert(ptr != NULL);
 
 	bio->ptr = ptr;
+	bio->end = (char *)end - 3;
 
 	switch (mode) {
 		case BIO_MODE_READ:
@@ -57,7 +59,12 @@ static void bio_reload_buffer(struct bio *bio)
 	assert(bio != NULL);
 	assert(bio->ptr != NULL);
 
-	bio->b = *(bio->ptr++);
+	if ((void *)bio->ptr < bio->end) {
+		bio->b = *(bio->ptr++);
+	} else {
+		bio->b = 0x80000000;
+	}
+
 	bio->c = 0;
 }
 
@@ -330,7 +337,7 @@ void *compress(void *iptr, size_t isize, void *optr)
 	unsigned char *end = (unsigned char *)iptr + isize;
 	struct context *context = table + 0;
 
-	bio_open(&bio, optr, BIO_MODE_WRITE);
+	bio_open(&bio, optr, NULL, BIO_MODE_WRITE);
 
 	for (unsigned char *iptrc = iptr; iptrc < end; ++iptrc) {
 		unsigned char c = *iptrc;
@@ -359,12 +366,13 @@ void *compress(void *iptr, size_t isize, void *optr)
 	return bio.ptr;
 }
 
-void *decompress(void *iptr, void *optr)
+void *decompress(void *iptr, size_t isize, void *optr)
 {
 	struct bio bio;
+	unsigned char *end = (unsigned char *)iptr + isize;
 	struct context *context = table + 0;
 
-	bio_open(&bio, iptr, BIO_MODE_READ);
+	bio_open(&bio, iptr, end, BIO_MODE_READ);
 
 	unsigned char *optrc = optr;
 

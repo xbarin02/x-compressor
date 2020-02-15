@@ -121,14 +121,6 @@ size_t multi_compress(size_t j)
 	return layer[j].size < layer[J].size ? j : J;
 }
 
-static void insert_guard(unsigned char *end)
-{
-	memset(end, 0, 16);
-
-	end[ 3] = 0x80;
-	end[12] = 0x01;
-}
-
 void multi_decompress(size_t j)
 {
 	if (j == 0) {
@@ -137,7 +129,7 @@ void multi_decompress(size_t j)
 
 	assert(j > 0 && j < 256);
 
-	layer[j - 1].data = malloc(8 * layer[j].size + 16);
+	layer[j - 1].data = malloc(8 * layer[j].size + 4096);
 
 	if (layer[j - 1].data == NULL) {
 		abort();
@@ -145,9 +137,7 @@ void multi_decompress(size_t j)
 
 	init();
 
-	void *end = decompress(layer[j].data, layer[j - 1].data);
-
-	insert_guard(end);
+	void *end = decompress(layer[j].data, layer[j].size, layer[j - 1].data);
 
 	layer[j - 1].size = (char *)end - (char *)layer[j - 1].data;
 
@@ -157,7 +147,7 @@ void multi_decompress(size_t j)
 void load_layer(size_t j, FILE *stream)
 {
 	layer[j].size = fsize(stream);
-	layer[j].data = malloc(layer[j].size + 16);
+	layer[j].data = malloc(layer[j].size);
 
 	if (layer[j].data == NULL) {
 		fprintf(stderr, "Out of memory\n");
@@ -165,10 +155,6 @@ void load_layer(size_t j, FILE *stream)
 	}
 
 	fload(layer[j].data, layer[j].size, stream);
-
-	void *end = (char *)layer[j].data + layer[j].size;
-
-	insert_guard(end);
 
 	fprintf(stderr, "Input size: %lu bytes\n", (unsigned long)layer[j].size);
 }
