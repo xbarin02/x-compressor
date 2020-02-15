@@ -189,10 +189,8 @@ static void bio_close(struct bio *bio, int mode)
 
 static void bio_write_unary(struct bio *bio, uint32_t N)
 {
-	while (N > 32) {
+	for (; N > 32; N -= 32) {
 		bio_write_zero_bits(bio, 32);
-
-		N -= 32;
 	}
 
 	bio_write_zero_bits(bio, N);
