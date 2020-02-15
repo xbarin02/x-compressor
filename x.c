@@ -68,6 +68,7 @@ void print_help(char *path)
 {
 	fprintf(stderr, "Usage :\n\t%s [arguments] [input-file] [output-file]\n\n", path);
 	fprintf(stderr, "Arguments :\n");
+	fprintf(stderr, " -0     : store only\n");
 	fprintf(stderr, " -1     : compress faster (default)\n");
 	fprintf(stderr, " -9     : compress better\n");
 	fprintf(stderr, " -d     : force decompression\n");
@@ -96,7 +97,9 @@ size_t multi_compress(size_t j)
 {
 	size_t J = j + 1;
 
-	assert(J < 256);
+	if (J >= 256 || J > max_layers) {
+		return j;
+	}
 
 	layer[J].data = malloc(8 * layer[j].size);
 
@@ -110,7 +113,7 @@ size_t multi_compress(size_t j)
 
 	layer[J].size = (char *)end - (char *)layer[J].data;
 
-	if (J + 1 < 256 && J + 1 <= max_layers && (layer[J].size < layer[j].size || J < min_layers)) {
+	if (layer[J].size < layer[j].size || J < min_layers) {
 		/* try next layer */
 		J = multi_compress(J);
 	}
@@ -197,7 +200,7 @@ int main(int argc, char *argv[])
 	FILE *ostream = NULL;
 	int force = 0;
 
-	parse: switch (getopt(argc, argv, "zdf19kh")) {
+	parse: switch (getopt(argc, argv, "zdf019kh")) {
 		case 'z':
 			mode = COMPRESS;
 			goto parse;
@@ -206,6 +209,9 @@ int main(int argc, char *argv[])
 			goto parse;
 		case 'f':
 			force = 1;
+			goto parse;
+		case '0':
+			max_layers = 0;
 			goto parse;
 		case '1':
 			max_layers = 1;
